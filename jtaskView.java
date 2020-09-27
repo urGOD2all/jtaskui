@@ -7,6 +7,9 @@ import TreeTable.TreeTable;
 
 import javax.swing.JFrame;
 import java.awt.BorderLayout;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
@@ -14,15 +17,23 @@ import javax.swing.JLabel;
 import javax.swing.border.BevelBorder;
 import java.awt.Dimension;
 
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 /**
  * This code creates the main window and adds/manages the Task Table.
  */
-public class jtaskView {
+public class jtaskView implements ActionListener {
     // The main window with the Task Table on it
     private JFrame rootFrame;
+    // The menu bar for the rootFrame
+    private JMenuBar menuBar;
+    // The menus for the rootFrame
+    private JMenu file;
+    // The menu items for the rootFrame menus
+    private JMenuItem fileOpen, fileClose, fileQuit;
     // A scroll pane for Task Table (ensures we can scroll if the nodes or nodes that are expanded go beyond the bounds)
     private JScrollPane rootScrollpane;
     // The Task Table
@@ -38,9 +49,30 @@ public class jtaskView {
     public jtaskView(TaskObj root) {
         // TODO: This needs to be removed when we have proper show/hide support in the GUI. ATM its tested from doubleclicks which this controls
         i = 1;
-        // Make the frame and setup the layout
+        // Make the frame and do some general setup
         rootFrame = new JFrame();
         rootFrame.setLayout(new BorderLayout());
+
+        // Create the menu bar
+        menuBar = new JMenuBar();
+
+        // The "File" menu bar item
+        file = new JMenu("File");
+        fileOpen = new JMenuItem("Open");
+        fileOpen.addActionListener(this);
+        fileClose = new JMenuItem("Close");
+        fileClose.addActionListener(this);
+        fileQuit = new JMenuItem("Quit");
+        fileQuit.addActionListener(this);
+        // Build the file menu
+        file.add(fileOpen);
+        file.add(fileClose);
+        file.add(fileQuit);
+
+        // Add the menus to the menu bar
+        menuBar.add(file);
+        // Add the menu bar to the rootFrame
+        rootFrame.add(menuBar, BorderLayout.NORTH);
 
         // Make a panel for the status bar
         JPanel statusPanel = new JPanel();
@@ -137,7 +169,7 @@ public class jtaskView {
      * @param position - The location it should appear in the table
      */
     public void showColumn(String columnName, int position) {
-        getModel().addColumnByName("Creation Date");
+        getModel().addColumnByName(columnName);
     }
 
     // TODO: Maybe change this to be by name ?
@@ -148,5 +180,22 @@ public class jtaskView {
      */
     public void hideColumn(int position) {
         getModel().removeColumn(position);
+    }
+
+    /**
+     * Action listener method
+     */
+    public void actionPerformed(ActionEvent e) {
+        if(e.getSource() == fileOpen) {
+            // do file chooser
+        }
+        else if (e.getSource() == fileClose) {
+            // do reset of TreeTable, close file handles etc etc....
+        }
+        else if(e.getSource() == fileQuit) {
+            // Time to exit
+            rootFrame.dispose();
+            System.exit(0);
+        }
     }
 }
