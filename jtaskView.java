@@ -92,7 +92,7 @@ public class jtaskView {
         // Add the TreeTable to the scroll pane
         JScrollPane rootScrollpane = new JScrollPane(taskTreeTable);
         // Add the scroll pane to the JFrame
-        rootFrame.add(rootScrollpane);
+        rootFrame.add(rootScrollpane, BorderLayout.CENTER);
         // TODO: Perhaps take these values from params to the constructor. Then we can save this to the file config and restore the correct size ?
         rootFrame.setSize(800,600);
         rootFrame.setVisible(true);
