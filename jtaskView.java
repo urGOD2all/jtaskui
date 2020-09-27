@@ -31,23 +31,23 @@ public class jtaskView implements ActionListener {
     // The menu bar for the rootFrame
     private JMenuBar menuBar;
     // The menus for the rootFrame
-    private JMenu file;
+    private JMenu file, view, viewColumns;
     // The menu items for the rootFrame menus
-    private JMenuItem fileOpen, fileClose, fileQuit;
+    private JMenuItem fileOpen, fileClose, fileQuit, viewColumnsCreationDate;
     // A scroll pane for Task Table (ensures we can scroll if the nodes or nodes that are expanded go beyond the bounds)
     private JScrollPane rootScrollpane;
     // The Task Table
     private TreeTable taskTreeTable;
     // The Model of the Task Table
     private jTaskViewTreeTableModel treeTableModel;
-    // TODO: This needs to be removed when we have proper show/hide support in the GUI. ATM its tested from doubleclicks which this controls
+    // TODO: This needs to be removed when we have proper show/hide support in the GUI.
     int i;
     /*
      * Constructors
      */
 
     public jtaskView(TaskObj root) {
-        // TODO: This needs to be removed when we have proper show/hide support in the GUI. ATM its tested from doubleclicks which this controls
+        // TODO: This needs to be removed when we have proper show/hide support in the GUI.
         i = 1;
         // Make the frame and do some general setup
         rootFrame = new JFrame();
@@ -64,13 +64,26 @@ public class jtaskView implements ActionListener {
         fileClose.addActionListener(this);
         fileQuit = new JMenuItem("Quit");
         fileQuit.addActionListener(this);
-        // Build the file menu
+        // Build the File menu
         file.add(fileOpen);
         file.add(fileClose);
         file.add(fileQuit);
 
+        // The "View" menu bar item
+        view = new JMenu("View");
+        viewColumns = new JMenu("Columns");
+        // TODO: Need to sort out a list of columns somewhere, maybe TaskObj ?
+        viewColumnsCreationDate = new JMenuItem("Creation Date");
+        viewColumnsCreationDate.addActionListener(this);
+        // Build the View menu
+        view.add(viewColumns);
+        viewColumns.add(viewColumnsCreationDate);
+
+
         // Add the menus to the menu bar
         menuBar.add(file);
+        menuBar.add(view);
+
         // Add the menu bar to the rootFrame
         rootFrame.add(menuBar, BorderLayout.NORTH);
 
@@ -99,7 +112,7 @@ public class jtaskView implements ActionListener {
         taskTreeTable.setRootVisible(false);
         // Make sure all the chidlren have a expansion handles
         taskTreeTable.setShowsRootHandles(true);
-
+/*
         // TODO: Fix this derpy code. It does work to return what row was clicked on and is currently used to test hiding/showing cols
         taskTreeTable.addMouseListener(new MouseAdapter() {
          public void mouseClicked(MouseEvent me) {
@@ -120,7 +133,7 @@ public class jtaskView implements ActionListener {
             }   
          }   
       }); 
-
+*/
         // Add the TreeTable to the scroll pane
         JScrollPane rootScrollpane = new JScrollPane(taskTreeTable);
         // Add the scroll pane to the JFrame
@@ -183,19 +196,42 @@ public class jtaskView implements ActionListener {
     }
 
     /**
+     * Returns true if the specified column is showing in the view, false otherwise
+     *
+     * @param columnName - String representing a valid column in a TaskObj to test
+     * @return boolean - true if column on show, false otherwise
+     */
+    public boolean isColumnVisible(String columnName) {
+        // TODO: This needs to be removed when we have column visibility tracking
+        if(i == 1) return true;
+        return false;
+    }
+
+    /**
      * Action listener method
      */
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == fileOpen) {
+        // Store the location of the event so we don't have to keep caling for it
+        Object sourceEvent = e.getSource();
+
+        if(sourceEvent == fileOpen) {
             // do file chooser
         }
-        else if (e.getSource() == fileClose) {
+        else if (sourceEvent == fileClose) {
             // do reset of TreeTable, close file handles etc etc....
         }
-        else if(e.getSource() == fileQuit) {
+        else if(sourceEvent == fileQuit) {
             // Time to exit
             rootFrame.dispose();
             System.exit(0);
+        }
+        else if(sourceEvent == viewColumnsCreationDate) {
+            if(isColumnVisible(e.getActionCommand())) { 
+                hideColumn(1);
+                // TODO: This needs to be removed when we have column visibility tracking
+                i = 0;
+            }
+            else showColumn("Creation Date",1);
         }
     }
 }
