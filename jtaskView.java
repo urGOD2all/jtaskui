@@ -6,7 +6,13 @@ import jtaskui.view.jTaskViewTreeTableModel;
 import TreeTable.TreeTable;
 
 import javax.swing.JFrame;
+import java.awt.BorderLayout;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JLabel;
+
+import javax.swing.border.BevelBorder;
+import java.awt.Dimension;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -32,15 +38,34 @@ public class jtaskView {
     public jtaskView(TaskObj root) {
         // TODO: This needs to be removed when we have proper show/hide support in the GUI. ATM its tested from doubleclicks which this controls
         i = 1;
+        // Make the frame and setup the layout
         rootFrame = new JFrame();
+        rootFrame.setLayout(new BorderLayout());
+
+        // Make a panel for the status bar
+        JPanel statusPanel = new JPanel();
+        // Lower its edges
+        statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
+        // Add the status panel to the frame at the bottom
+        rootFrame.add(statusPanel, BorderLayout.SOUTH);
+        // Make the size of the panel equal to the width of the frame
+        statusPanel.setPreferredSize(new Dimension(rootFrame.getWidth(), 16));
+        // Set the layout
+        statusPanel.setLayout(new BorderLayout());
+        // Create a JLabel to display the text of the status panel
+        JLabel itemsLabel = new JLabel("Will display total number of items etc");
+        JLabel itemStatsLabel = new JLabel("Will display number of overdue items etc");
+        // Add the label to the panel
+        statusPanel.add(itemsLabel, BorderLayout.WEST);
+        statusPanel.add(itemStatsLabel, BorderLayout.EAST);
+
         // Make a new TreeTableModel and pass the root object
         treeTableModel = new jTaskViewTreeTableModel(root);
-
         // Add the TreeTableModel to the Treetable
         taskTreeTable = new TreeTable(treeTableModel);
         // Hide the root node
         taskTreeTable.setRootVisible(false);
-        // Make sure all the chidlren have an expansion handles
+        // Make sure all the chidlren have a expansion handles
         taskTreeTable.setShowsRootHandles(true);
 
         // TODO: Fix this derpy code. It does work to return what row was clicked on and is currently used to test hiding/showing cols
