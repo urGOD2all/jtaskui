@@ -5,7 +5,7 @@ import jtaskui.TaskObj;
 import TreeTable.AbstractTreeTableModel;
 import TreeTable.TreeTableModel;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 public class jTaskViewTreeTableModel extends AbstractTreeTableModel {
     // Set the version ID for this class because it is serializable
@@ -13,26 +13,27 @@ public class jTaskViewTreeTableModel extends AbstractTreeTableModel {
 
     // This object will be the top of the TreeTable
     private TaskObj root;
-    // This Vector will store all the names of the columns
-    private Vector<String> columnNames;
-    // This Vector will store all the names of the columns for the Model
+
+    // This Arraylist will store all the names of the columns
+    private ArrayList<String> columnNames;
+
     // TODO: This needs some fixing
     // Store the column classes
-    static protected Class<?>[] columnTypes = { TreeTableModel.class, String.class };
+    private Class<?>[] columnTypes = { TreeTableModel.class, String.class };
 
     /*
      * Constructors
      */
 
-// TODO: Can I make this constructor private ?
     /**
      * Default constructor. Initializes the vectors for storing information about the TreeTable
      */
-    public jTaskViewTreeTableModel() {
+    private jTaskViewTreeTableModel() {
         super();
-        columnNames = new Vector<String>();
+        columnNames = new ArrayList<String>();
         this.addColumn("Task Subject");
         this.addColumn("Creation Date");
+        this.addColumn("Modification Date");
     }
 
     /**
@@ -91,6 +92,8 @@ public class jTaskViewTreeTableModel extends AbstractTreeTableModel {
                 return task.getSubject();
             case "Creation Date":
                 return task.getCreationDateTime();
+            case "Modification Date":
+                return task.getModificationDateTime();
             default:
                 return "ERROR: Failed to getValueAt " + columnIndex;
         }
@@ -187,10 +190,10 @@ public class jTaskViewTreeTableModel extends AbstractTreeTableModel {
    /**
     * Removes the specified column from the view
     *
-    * @param columnIndex - int column position to remove from the view
+    * @param name - String representing the name of a valid column from TaskObj
     */
-   public void removeColumn(int columnIndex) {
-       columnNames.remove(columnIndex);
+   public void removeColumn(String name) {
+       columnNames.remove(name);
        fireTableStructureChanged();
    }
 
@@ -198,9 +201,10 @@ public class jTaskViewTreeTableModel extends AbstractTreeTableModel {
     * Add the specified column to the view
     *
     * @param name - String representing the name of a valid column from TaskObj
+    * @param position - The location it should appear in the table
     */
-   public void addColumnByName(String name) {
-       columnNames.add(name);
+   public void addColumnByName(String name, int position) {
+       columnNames.add(position, name);
        fireTableStructureChanged();
    }
 
@@ -229,5 +233,9 @@ public class jTaskViewTreeTableModel extends AbstractTreeTableModel {
      */
     private void addColumn(String col) {
         columnNames.add(col);
+    }
+
+    public boolean isColumnVisible(String name) {
+        return columnNames.contains(name);
     }
 }

@@ -33,22 +33,18 @@ public class jtaskView implements ActionListener {
     // The menus for the rootFrame
     private JMenu file, view, viewColumns;
     // The menu items for the rootFrame menus
-    private JMenuItem fileOpen, fileClose, fileQuit, viewColumnsCreationDate;
+    private JMenuItem fileOpen, fileClose, fileQuit, viewColumnsCreationDate, viewColumnsModificationDate;
     // A scroll pane for Task Table (ensures we can scroll if the nodes or nodes that are expanded go beyond the bounds)
     private JScrollPane rootScrollpane;
     // The Task Table
     private TreeTable taskTreeTable;
     // The Model of the Task Table
     private jTaskViewTreeTableModel treeTableModel;
-    // TODO: This needs to be removed when we have proper show/hide support in the GUI.
-    int i;
     /*
      * Constructors
      */
 
     public jtaskView(TaskObj root) {
-        // TODO: This needs to be removed when we have proper show/hide support in the GUI.
-        i = 1;
         // Make the frame and do some general setup
         rootFrame = new JFrame();
         rootFrame.setLayout(new BorderLayout());
@@ -75,9 +71,12 @@ public class jtaskView implements ActionListener {
         // TODO: Need to sort out a list of columns somewhere, maybe TaskObj ?
         viewColumnsCreationDate = new JMenuItem("Creation Date");
         viewColumnsCreationDate.addActionListener(this);
+        viewColumnsModificationDate = new JMenuItem("Modification Date");
+        viewColumnsModificationDate.addActionListener(this);
         // Build the View menu
         view.add(viewColumns);
         viewColumns.add(viewColumnsCreationDate);
+        viewColumns.add(viewColumnsModificationDate);
 
 
         // Add the menus to the menu bar
@@ -174,7 +173,6 @@ public class jtaskView implements ActionListener {
      * Other methods
      */
 
-    // TODO: Need to make sure that the model is able to put the column in the given position
     /**
      * Takes the name of the column and the position in the view it should appear in.
      *
@@ -182,17 +180,34 @@ public class jtaskView implements ActionListener {
      * @param position - The location it should appear in the table
      */
     public void showColumn(String columnName, int position) {
-        getModel().addColumnByName(columnName);
+        getModel().addColumnByName(columnName, position);
     }
 
-    // TODO: Maybe change this to be by name ?
     /**
-     * Takes a column position from the Table and hides it from the view
+     * Takes the name of the column to hide.
      *
-     * @param position - The location of the column to hide
+     * @param columnName - String representing a valid column in a TaskObj to hide
+     * @param position - The location it should appear in the table
      */
-    public void hideColumn(int position) {
-        getModel().removeColumn(position);
+    public void hideColumn(String columnName) {
+        getModel().removeColumn(columnName);
+    }
+
+    /**
+     * Takes the name of a column to toggle the visibility for. If the column is hidden in the view then the column will be shown in the specified position.
+     * If the column is already showing in the view, it will be removed and the position parameter is ignored.
+     *
+     * @param columnName - String representing a valid column in a TaskObj to hide
+     * @param position - The location it should appear in the table
+     */
+    private void toggleColumnVisible(String columnName, int position) {
+        if(isColumnVisible(columnName)) {
+            hideColumn(columnName);
+        }
+        else {
+            if(position > getModel().getColumnCount()) position = getModel().getColumnCount();
+            showColumn(columnName, position);
+        }
     }
 
     /**
@@ -202,9 +217,7 @@ public class jtaskView implements ActionListener {
      * @return boolean - true if column on show, false otherwise
      */
     public boolean isColumnVisible(String columnName) {
-        // TODO: This needs to be removed when we have column visibility tracking
-        if(i == 1) return true;
-        return false;
+        return getModel().isColumnVisible(columnName);
     }
 
     /**
@@ -226,12 +239,10 @@ public class jtaskView implements ActionListener {
             System.exit(0);
         }
         else if(sourceEvent == viewColumnsCreationDate) {
-            if(isColumnVisible(e.getActionCommand())) { 
-                hideColumn(1);
-                // TODO: This needs to be removed when we have column visibility tracking
-                i = 0;
-            }
-            else showColumn("Creation Date",1);
+            toggleColumnVisible("Creation Date",1);
+        }
+        else if(sourceEvent == viewColumnsModificationDate) {
+            toggleColumnVisible("Modification Date",2);
         }
     }
 }
