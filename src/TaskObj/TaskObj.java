@@ -362,7 +362,11 @@ public class TaskObj {
         return unsupportedItems.size();
     }
 
-// TODO: This solves the rendering issue, do I want the subject to be the toString ?
+    /**
+     * Returns the task subject for the toString method because it will always be the expandable row.
+     *
+     * @param String - Subject of the task
+     */
     @Override
     public String toString() {
         return this.getSubject();
