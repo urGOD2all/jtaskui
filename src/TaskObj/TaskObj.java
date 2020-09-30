@@ -215,9 +215,9 @@ public class TaskObj {
      * This is read from the XML as a String so this takes a String but sets an int.
      * If this becomes a problem in the future I will change this to a String.
      */
-    private void setStatus(String status) {
+    private void setStatus(String value) {
         try {
-            this.status = Integer.parseInt(status);
+            this.status = Integer.parseInt(value);
         }
         catch(NumberFormatException nfe) {
             System.out.println("ERROR: Failed to parse status, setting to 1");
@@ -237,25 +237,25 @@ public class TaskObj {
     }
 
     // TODO: Need to take a proper dt object
-    public void setCreationDateTime(String creationDT) {
-        creationDateTime = creationDT;
+    public void setCreationDateTime(String value) {
+        creationDateTime = value;
         attributes.put("creationDateTime", value);
     }
 
     // TODO: Need to take a proper dt object
-    public void setModificationDateTime(String modificationDT) {
-        modificationDateTime = modificationDT;
+    public void setModificationDateTime(String value) {
+        modificationDateTime = value;
         attributes.put("modificationDateTime", value);
     }
 
     // TODO: Need to take a proper dt object
-    public void setActualStartDateTime(String actualStartDT) {
-        actualStartDateTime = actualStartDT;
+    public void setActualStartDateTime(String value) {
+        actualStartDateTime = value;
         attributes.put("actualstartdate", value);
     }
 
-    public void setSubject(String subject) {
-        this.subject = subject;
+    public void setSubject(String value) {
+        this.subject = value;
         attributes.put("subject", value);
     }
 
@@ -268,15 +268,15 @@ public class TaskObj {
 
     /* This will set the ID. I dont think this will change so keep it private
      */
-    private void setID(String id) {
-        this.ID = id;
+    private void setID(String value) {
+        this.ID = value;
         attributes.put("id", value);
     }
 
     // TODO: This may need to accept something else depending on what we decide to the TODO in the global where the variable is declared
     // TODO: Given the above, this may need to be changed from a "set" to an "add" method
-    public void setExpandedContexts(String context) {
-        this.expandedContexts = context;
+    public void setExpandedContexts(String value) {
+        this.expandedContexts = value;
         attributes.put("expandedContexts", value);
     }
 
