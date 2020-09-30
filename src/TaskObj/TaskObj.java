@@ -12,6 +12,7 @@ public class TaskObj {
     private Node taskNode;
     private NamedNodeMap taskAttributes;
 
+    // TODO: Do we get any value from not having all this just in a single HashMap? I don't know if its worth storing a date object in here. Could just return a date object after converting the String, its going to be a String anyway
     // TODO: these need to some kind of date time object
     // This is the date that the task was created
     private String creationDateTime;
@@ -36,6 +37,8 @@ public class TaskObj {
     // TODO: what does this represent ? Is it if its expanded or if its in progress / complete ?
     private int status;
 
+    // This is a map of all the attributes that the task has
+    private HashMap<String, String> attributes;
     // This is a Map of all attributes that are unsupported by this code. Ideally this should have no items in it!
     private HashMap<String, String> unsupportedItems;
     // TODO: I dont like this, I think its naff. I think the better option would be to use a sortable Collection like TreeSet
@@ -55,7 +58,9 @@ public class TaskObj {
     /*
      * TODO: Does this constructor serve any purpose?
      */
-    public TaskObj() {
+    private TaskObj() {
+        // Initialise the attributes HashMap
+        attributes = new HashMap<String, String>();
         setCreationDateTime();
     }
 
@@ -63,6 +68,7 @@ public class TaskObj {
     * This is typical when a file is being read and existing tasks are being created
     */
     public TaskObj(Node task) {
+        this();
         // Set the local node
         this.taskNode = task;
         // Get the attributes
@@ -87,6 +93,7 @@ public class TaskObj {
      * @param ID - String object containing this tasks ID. This is typically a GUID.
      */
     public TaskObj(String ID, String subject) {
+        this();
         setupTask(ID, subject);
     }
 
@@ -218,6 +225,7 @@ public class TaskObj {
         finally {
             this.status = 1;
         }
+        attributes.put("status", value);
     }
 
     // TODO: Need to create a proper dt object
@@ -231,20 +239,24 @@ public class TaskObj {
     // TODO: Need to take a proper dt object
     public void setCreationDateTime(String creationDT) {
         creationDateTime = creationDT;
+        attributes.put("creationDateTime", value);
     }
 
     // TODO: Need to take a proper dt object
     public void setModificationDateTime(String modificationDT) {
         modificationDateTime = modificationDT;
+        attributes.put("modificationDateTime", value);
     }
 
     // TODO: Need to take a proper dt object
     public void setActualStartDateTime(String actualStartDT) {
         actualStartDateTime = actualStartDT;
+        attributes.put("actualstartdate", value);
     }
 
     public void setSubject(String subject) {
         this.subject = subject;
+        attributes.put("subject", value);
     }
 
     /*
@@ -258,12 +270,14 @@ public class TaskObj {
      */
     private void setID(String id) {
         this.ID = id;
+        attributes.put("id", value);
     }
 
     // TODO: This may need to accept something else depending on what we decide to the TODO in the global where the variable is declared
     // TODO: Given the above, this may need to be changed from a "set" to an "add" method
     public void setExpandedContexts(String context) {
         this.expandedContexts = context;
+        attributes.put("expandedContexts", value);
     }
 
     /*
@@ -300,8 +314,8 @@ public class TaskObj {
         return actualStartDateTime;
     }
 
-    public NamedNodeMap getAttributes() {
-        return taskAttributes;
+    public HashMap<String, String> getAttributes() {
+        return new HashMap<String, String>(attributes);
     }
 
     // TODO: See the TODOs on the setter
