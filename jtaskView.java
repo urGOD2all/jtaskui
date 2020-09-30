@@ -22,6 +22,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+// Import the Output classes
+import jtaskui.Output.*;
+
 /**
  * This code creates the main window and adds/manages the Task Table.
  */
@@ -33,7 +36,7 @@ public class jtaskView implements ActionListener {
     // The menus for the rootFrame
     private JMenu file, view, viewColumns;
     // The menu items for the rootFrame menus
-    private JMenuItem fileOpen, fileClose, fileQuit, viewColumnsCreationDate, viewColumnsModificationDate;
+    private JMenuItem fileOpen, fileSave, fileClose, fileQuit, viewColumnsCreationDate, viewColumnsModificationDate;
     // A scroll pane for Task Table (ensures we can scroll if the nodes or nodes that are expanded go beyond the bounds)
     private JScrollPane rootScrollpane;
     // The Task Table
@@ -56,12 +59,15 @@ public class jtaskView implements ActionListener {
         file = new JMenu("File");
         fileOpen = new JMenuItem("Open");
         fileOpen.addActionListener(this);
+        fileSave = new JMenuItem("Save");
+        fileSave.addActionListener(this);
         fileClose = new JMenuItem("Close");
         fileClose.addActionListener(this);
         fileQuit = new JMenuItem("Quit");
         fileQuit.addActionListener(this);
         // Build the File menu
         file.add(fileOpen);
+        file.add(fileSave);
         file.add(fileClose);
         file.add(fileQuit);
 
@@ -229,6 +235,15 @@ public class jtaskView implements ActionListener {
 
         if(sourceEvent == fileOpen) {
             // do file chooser
+        }
+        else if (sourceEvent == fileSave) {
+            // TODO: This needs to save back to the original file
+            TaskObjXMLWriter save = new TaskObjXMLWriter("./test.tsk", getModel().getRoot());
+            save.connect();
+            if(save.isConnected()) {
+                save.write();
+                save.disconnect();
+            }
         }
         else if (sourceEvent == fileClose) {
             // do reset of TreeTable, close file handles etc etc....
