@@ -199,6 +199,9 @@ public class TaskObj {
                 case "actualstartdate":
                     setActualStartDateTime(value);
                     break;
+                case "bgColor":
+                    setBGColor(value);
+                    break;
                 default:
                     // If we don't match something we know about then add it to the list of unsupported items until we get code to support it
                     unsupportedItems.put(key, value);
@@ -280,6 +283,10 @@ public class TaskObj {
         attributes.put("expandedContexts", value);
     }
 
+    public void setBGColor(String value) {
+        attributes.put("bgColor", value);
+    }
+
     /*
      * Getters
      */
@@ -321,6 +328,11 @@ public class TaskObj {
     // TODO: See the TODOs on the setter
     public String getExpandedContexts() {
         return expandedContexts;
+    }
+
+    // TODO: Should we return an object that can represent this so we dont have to handle it anywhere else ?
+    public String getBGColor(String value) {
+        return attributes.get("bgColor");
     }
 
     // TODO: Can this be modified outside this object if a caller gets a handle on this ?
