@@ -96,11 +96,21 @@ public class TaskObjXMLWriter {
 
         // Create an Element for this task
         e = doc.createElement("task");
-// TODO: This needs fixing, it will only look at the first child.
+
+        // TODO: This needs fixing, it will only look at the first child.
+        // Add all the attributes to the Task Element object
         for(Map.Entry<String, String> attribute : rootTask.getChildAt(1).getAttributes().entrySet()) {
             e.setAttribute(attribute.getKey(), attribute.getValue());
-            root.appendChild(e);
         }
+        // TODO: Do some checking and make sure there is a desciption to add
+        // Add the Task Description
+        Element desc = doc.createElement("description");
+        desc.setTextContent(rootTask.getChildAt(1).getDescription());
+        // Add this description Element to the Task Element
+        e.appendChild(desc);
+
+        // Add this Task Element to the Document root
+        root.appendChild(e);
     }
 
     public void write() {
