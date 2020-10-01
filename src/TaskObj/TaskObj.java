@@ -7,6 +7,8 @@ import java.util.HashMap;
 // TODO: This can be removed when I'm done looking at unsupported items in notes in this class
 import java.util.Map;
 
+import java.util.UUID;
+
 // TODO: as we now use this for notes as there is much overlap, we should consider perhaps having an enum to tell us what type of object this is ?
 public class TaskObj {
     private Node taskNode;
@@ -55,8 +57,8 @@ public class TaskObj {
      * Constructors
      */
 
-    /*
-     * TODO: Does this constructor serve any purpose?
+    /**
+     * Constructor to initialise this TaskObj
      */
     private TaskObj() {
         // Initialise the attributes HashMap
@@ -64,6 +66,7 @@ public class TaskObj {
         setCreationDateTime();
     }
 
+    // TODO: I would like to remove all the things that tie this object to XML reading. This constructor is one of those things
    /*
     * This is typical when a file is being read and existing tasks are being created
     */
@@ -83,33 +86,22 @@ public class TaskObj {
         populateSubtasks();
     }
 
-    // TODO: Perhaps this is not typical of that, where did the ID come from? derp
-    // TODO: Given the above TODO I think is refering to creating new tasks, it would infer the job of creating the GUID be that of the caller which I dont think is write. We should generate the GUID here so this needs re-work.
     /**
-     * Construction of a basic task
-     * This is typical when new tasks are created.
-     * It is also used to create the first (root) object for the TreeTable to hold all the other tasks.
+     * Constructor of a basic task.
+     * This is typically called to create new Tasks.
+     * This is also called to create the first (root) TaskObj for the TreeTable to hold all the other tasks in a tree like structure.
      *
-     * @param ID - String object containing this tasks ID. This is typically a GUID.
+     * @param subject - String representing the subject of the Task
      */
-    public TaskObj(String ID, String subject) {
+    public TaskObj(String subject) {
         this();
-        setupTask(ID, subject);
+        setID(UUID.randomUUID().toString());
+        setSubject(subject);
     }
 
     /*
      * Other methods
      */
-
-    /*
-     * User to perform some common task setup functions. This is typical when a new task is created.
-     */
-    private void setupTask(String ID, String subject) {
-        setID(ID);
-        setSubject(subject);
-        setCreationDateTime();
-        setDescription("");
-    }
 
     // TODO: Getters and setters for subtasks
     // TODO: Getters and setters for notes
@@ -139,7 +131,7 @@ public class TaskObj {
 //                          // Create a new TaskObj for the child
                             childTask = new TaskObj(child);
                             // Store the child in the map
-                            childMap.put(childMap.size()+1, childTask);
+                            addChild(childTask);
                             break;
                         case "description":
                             if (child.getTextContent() != null) setDescription(child.getTextContent());

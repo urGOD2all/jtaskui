@@ -97,7 +97,7 @@ public class jtaskui {
                 // System.out.println("No more nodes");
 
                 // Make a TaskObj just to be the root and handle all the Tasks as its children. This should never be seen in the UI
-                TaskObj root = new TaskObj("1", "ROOT");
+                TaskObj root = new TaskObj("ROOT");
 
                 // Now lets see what tasks we have and add them all to the table
                 for (Map.Entry<String, TaskObj> aTask : tasksMap.entrySet()) {
