@@ -217,7 +217,7 @@ public class jTaskViewTreeTableModel extends AbstractTreeTableModel {
     @Override
     public boolean isLeaf(Object node) {
         TaskObj task = (TaskObj) node;
-        return task.hasChildren();
+        return ! task.hasChildren();
     }
 
     /* TODO: Will need to fire this when new tasks are created and added to the TreeTable

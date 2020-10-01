@@ -369,11 +369,11 @@ public class TaskObj {
     /**
      * If there are no children (subtasks) in the childMap then return true, otherwise false.
      *
-     * @return boolean - true if childMap has no entried, otherwise false
+     * @return boolean - true if this object contains children (subtasks), false if not
      */
     public boolean hasChildren() {
-        if (childMap.size() == 0) return true;
-        return false;
+        if (childMap.size() == 0) return false;
+        return true;
     }
 
     public int getUnsupportedAttributeCount() {
