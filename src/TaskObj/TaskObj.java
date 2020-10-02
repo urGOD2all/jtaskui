@@ -77,7 +77,7 @@ public class TaskObj {
         // Get the attributes
         this.taskAttributes = taskNode.getAttributes();
         // Set a default description
-        setDescription("");
+//        setDescription("");
 
         // Populate the attributes of this task on this object
         populateAttributes();
@@ -373,6 +373,11 @@ public class TaskObj {
      */
     public boolean hasChildren() {
         if (childMap.size() == 0) return false;
+        return true;
+    }
+
+    public boolean hasDescription() {
+        if (getDescription() == null) return false;
         return true;
     }
 
