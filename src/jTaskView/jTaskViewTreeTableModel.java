@@ -90,6 +90,8 @@ public class jTaskViewTreeTableModel extends AbstractTreeTableModel {
         switch (colName) {
             case "Task Subject":
                 return task.getSubject();
+            case "Description":
+                return task.getDescription();
             case "Creation Date":
                 return task.getCreationDateTime();
             case "Modification Date":

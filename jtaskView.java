@@ -36,7 +36,7 @@ public class jtaskView implements ActionListener {
     // The menus for the rootFrame
     private JMenu file, view, viewColumns;
     // The menu items for the rootFrame menus
-    private JMenuItem fileOpen, fileSave, fileClose, fileQuit, viewColumnsCreationDate, viewColumnsModificationDate;
+    private JMenuItem fileOpen, fileSave, fileClose, fileQuit, viewColumnsCreationDate, viewColumnsModificationDate, viewColumnsDescription;
     // A scroll pane for Task Table (ensures we can scroll if the nodes or nodes that are expanded go beyond the bounds)
     private JScrollPane rootScrollpane;
     // The Task Table
@@ -79,10 +79,13 @@ public class jtaskView implements ActionListener {
         viewColumnsCreationDate.addActionListener(this);
         viewColumnsModificationDate = new JMenuItem("Modification Date");
         viewColumnsModificationDate.addActionListener(this);
+        viewColumnsDescription = new JMenuItem("Description");
+        viewColumnsDescription.addActionListener(this);
         // Build the View menu
         view.add(viewColumns);
         viewColumns.add(viewColumnsCreationDate);
         viewColumns.add(viewColumnsModificationDate);
+        viewColumns.add(viewColumnsDescription);
 
 
         // Add the menus to the menu bar
@@ -258,6 +261,9 @@ public class jtaskView implements ActionListener {
         }
         else if(sourceEvent == viewColumnsModificationDate) {
             toggleColumnVisible("Modification Date",2);
+        }
+        else if(sourceEvent == viewColumnsDescription) {
+            toggleColumnVisible("Description",3);
         }
     }
 }
