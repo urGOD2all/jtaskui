@@ -116,6 +116,11 @@ public class TaskObjXMLWriter {
                 e.setAttribute(attribute.getKey(), attribute.getValue());
             }
 
+            // Add all the (currently) unsupported attributes to this Element object
+            for(Map.Entry<String, String> attribute : task.getUnsupportedAttributes().entrySet()) {
+                e.setAttribute(attribute.getKey(), attribute.getValue());
+            }
+
             // Check to see if we need to create a nested Element for the description
             if(task.hasDescription()) {
                 // Create an Element for the description
