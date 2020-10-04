@@ -322,7 +322,7 @@ public class TaskObj {
 
     // TODO: Should we return an object that can represent this so we dont have to handle it anywhere else ?
     public String getBGColor(String value) {
-        return attributes.get("bgColor");
+        return getAttribute("bgColor");
     }
 
     public HashMap<String, String> getUnsupportedAttributes() {
