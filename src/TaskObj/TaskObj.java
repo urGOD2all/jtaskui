@@ -9,40 +9,27 @@ import java.util.Map;
 
 import java.util.UUID;
 
+// TODO: Interesting observation, my test setup has Tasks with IDs that are mostly the same, look into this further
 // TODO: as we now use this for notes as there is much overlap, we should consider perhaps having an enum to tell us what type of object this is ?
 public class TaskObj {
     private Node taskNode;
     private NamedNodeMap taskAttributes;
 
-    // TODO: Do we get any value from not having all this just in a single HashMap? I don't know if its worth storing a date object in here. Could just return a date object after converting the String, its going to be a String anyway
-    // TODO: these need to some kind of date time object
-    // This is the date that the task was created
-    private String creationDateTime;
-    // This is the date that the task was last modified
-    private String modificationDateTime;
-    // This is the date that the task begun
-    private String actualStartDateTime;
-    // Store the description of this task
+    // This is a map of all the attributes that the task has
+    private HashMap<String, String> attributes;
+
+    // Store the description of this task. This is not an attribute so does not get stored in the attributes map
     private String description;
 
-    // TODO: Interesting observation, my test setup has IDs that are mostly the same, look into this further
-    // TODO: Should this be represented as a better object or is String OK here ?
-    // This is a task GUID, one would assume this is unique in the file
-    private String ID;
-    // This is the name of the task
-    private String subject;
     // TODO: This can have multiple entries, I think it needs storing as an array or something so it can be interogated better
     // TODO: Understand what this can get populated with and what it means
+    // TODO: As this is an attribute it should really be in (or returned within) the attributes map
     // This variable keeps state for when something is expanded or not and where
     private String expandedContexts;
 
-    // TODO: what does this represent ? Is it if its expanded or if its in progress / complete ?
-    private int status;
-
-    // This is a map of all the attributes that the task has
-    private HashMap<String, String> attributes;
     // This is a Map of all attributes that are unsupported by this code. Ideally this should have no items in it!
     private HashMap<String, String> unsupportedItems;
+
     // TODO: I dont like this, I think its naff. I think the better option would be to use a sortable Collection like TreeSet
     //  // TODO (cont.) : I can get that TreeSet Collection from a Vector so maybe this is best served as a Vector object ?
     // This is a Map of all the child tasks
@@ -76,8 +63,6 @@ public class TaskObj {
         this.taskNode = task;
         // Get the attributes
         this.taskAttributes = taskNode.getAttributes();
-        // Set a default description
-//        setDescription("");
 
         // Populate the attributes of this task on this object
         populateAttributes();
@@ -205,24 +190,16 @@ public class TaskObj {
      */
 
     // TODO: This is private for now until I find out what this does
-    /*
-     * Set the status of the task.
-     * This is read from the XML as a String so this takes a String but sets an int.
-     * If this becomes a problem in the future I will change this to a String.
+    /**
+     * Set the status attribute of this Task.
+     *
+     * @param String - value to set as the status
      */
     private void setStatus(String value) {
-        try {
-            this.status = Integer.parseInt(value);
-        }
-        catch(NumberFormatException nfe) {
-            System.out.println("ERROR: Failed to parse status, setting to 1");
-        }
-        finally {
-            this.status = 1;
-        }
         attributes.put("status", value);
     }
 
+    // TODO: Considering it will always be read from the XML file as a String, perhaps a getter should be available to return this as a Date? The only reason I think this might be needed is in the GUI but I might just handle it there...
     // TODO: Need to create a proper dt object
     /*
      * This is only used within the class when a new task is created.
@@ -233,24 +210,20 @@ public class TaskObj {
 
     // TODO: Need to take a proper dt object
     public void setCreationDateTime(String value) {
-        creationDateTime = value;
         attributes.put("creationDateTime", value);
     }
 
     // TODO: Need to take a proper dt object
     public void setModificationDateTime(String value) {
-        modificationDateTime = value;
         attributes.put("modificationDateTime", value);
     }
 
     // TODO: Need to take a proper dt object
     public void setActualStartDateTime(String value) {
-        actualStartDateTime = value;
         attributes.put("actualstartdate", value);
     }
 
     public void setSubject(String value) {
-        this.subject = value;
         attributes.put("subject", value);
     }
 
@@ -264,7 +237,6 @@ public class TaskObj {
     /* This will set the ID. I dont think this will change so keep it private
      */
     private void setID(String value) {
-        this.ID = value;
         attributes.put("id", value);
     }
 
@@ -283,16 +255,42 @@ public class TaskObj {
      * Getters
      */
 
+    /**
+     * Method to return an attributes value given an attribute name.
+     *
+     * @param name - String representing an attribute name
+     *
+     * @return String - value of the attribute requested or null if the attribute is not set
+     */
+    public String getAttribute(String name) {
+        return attributes.get(name);
+    }
+
+    // TODO: Do I want to return this as a String or int ?
+    /**
+     * Return the status attribute of this Task
+     *
+     * @return int - status attribute of the Task
+     */
     public int getStatus() {
-        return status;
+        try {
+            return Integer.parseInt(getAttribute("status"));
+        }
+        catch(NumberFormatException nfe) {
+            System.out.println("ERROR: Failed to parse status, setting to 1");
+        }
+        finally {
+            setStatus("1");
+            return 1;
+        }
     }
 
     public String getSubject() {
-        return subject;
+        return getAttribute("subject");
     }
 
     public String getID() {
-        return ID;
+        return getAttribute("id");
     }
 
     public String getDescription() {
@@ -301,16 +299,16 @@ public class TaskObj {
 
     // TODO: Should return some kind of date time object
     public String getCreationDateTime() {
-        return creationDateTime;
+        return getAttribute("creationDateTime");
     }
 
     // TODO: Should return some kind of date time object
     public String getModificationDateTime() {
-        return modificationDateTime;
+        return getAttribute("modificationDateTime");
     }
 
     public String getActualStartDateTime() {
-        return actualStartDateTime;
+        return getAttribute("actualStartDateTime");
     }
 
     public HashMap<String, String> getAttributes() {
@@ -327,9 +325,8 @@ public class TaskObj {
         return attributes.get("bgColor");
     }
 
-    // TODO: Can this be modified outside this object if a caller gets a handle on this ?
     public HashMap<String, String> getUnsupportedAttributes() {
-        return unsupportedItems;
+        return new HashMap<String, String>(unsupportedItems);
     }
 
     /*
