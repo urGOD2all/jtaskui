@@ -90,10 +90,6 @@ public class TaskObjXMLReader {
         // This object is used to hold the children and we inspect this object below to see if it looks like a task
         Node taskNodes;
 
-        /* TODO: At the moment this while loop creates a HashMap of the tasks for convenience but ideally this would not pass an XML node to TaskObj. 
-                 Ideally it would create the TaskObj after an input processor (for XML atm) has read the content. These TaskObj objects can then just
-                 be added to the ROOT TaskObj instead of a HashMap.
-        */
         // Loop as long as nodeIter is not null. First time will contain the first child and this will get updated in the loop. 
         //  When there is no children it will get set to null so will naturally close the loop
         while (nodeIter != null) {
@@ -104,21 +100,14 @@ public class TaskObjXMLReader {
                 // Loop as long as taskNodes is not null. First time will contain the first child of "<tasks>" and this will get updated in the loop. 
                 //   When there is no children it will get set to null so will naturally close the loop
                 while (taskNodes != null) {
-                    try {
-                        // Tasks are ELEMENT_NODE so test for that and see if its a Task
-                        if (taskNodes.getNodeType() == Node.ELEMENT_NODE) {
-                            // Test to see if we found a Task
-                            if(taskNodes.getNodeName() == "task") {
-                                // TODO: We should not pass XML to the TaskObj for reading
-                                // Initialise the task object with the Node object
-                                rootTask.addChild(new TaskObj(taskNodes));
-                            }
+                    // Tasks are ELEMENT_NODE so test for that and see if its a Task
+                    if (taskNodes.getNodeType() == Node.ELEMENT_NODE) {
+                        // Test to see if we found a Task
+                        if(taskNodes.getNodeName() == "task") {
+                            // TODO: We should not pass XML to the TaskObj for reading
+                            // Initialise the task object with the Node object
+                            rootTask.addChild(new TaskObj(taskNodes));
                         }
-                    }
-                    // TODO: This NPE catch should do something intelligent if something has gone this wrong
-                    catch(java.lang.NullPointerException npe) {
-                        System.out.println("Caught an NPE!");
-                        System.out.println(npe.toString());
                     }
                     // Go to the next child "node" / Get the next task
                     taskNodes = taskNodes.getNextSibling();
