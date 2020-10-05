@@ -111,7 +111,7 @@ public class TaskObjXMLReader {
                             if(taskNodes.getNodeName() == "task") {
                                 // TODO: We should not pass XML to the TaskObj for reading
                                 // Initialise the task object with the Node object
-                                TaskObj aTask = new TaskObj(taskNodes);
+                                rootTask.addChild(new TaskObj(taskNodes));
                             }
                         }
                     }
