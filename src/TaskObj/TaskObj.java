@@ -1,7 +1,5 @@
 package jtaskui;
 
-import org.w3c.dom.*;
-
 import java.util.HashMap;
 
 // TODO: This can be removed when I'm done looking at unsupported items in notes in this class
@@ -12,9 +10,6 @@ import java.util.UUID;
 // TODO: Interesting observation, my test setup has Tasks with IDs that are mostly the same, look into this further
 // TODO: as we now use this for notes as there is much overlap, we should consider perhaps having an enum to tell us what type of object this is ?
 public class TaskObj {
-    private Node taskNode;
-    private NamedNodeMap taskAttributes;
-
     // This is a map of all the attributes that the task has
     private HashMap<String, String> attributes;
 
@@ -50,25 +45,9 @@ public class TaskObj {
     private TaskObj() {
         // Initialise the attributes HashMap
         attributes = new HashMap<String, String>();
+        // Initialise the unsupported attributes HashMap
+        unsupportedItems = new HashMap<String, String>();
         setCreationDateTime();
-    }
-
-    // TODO: I would like to remove all the things that tie this object to XML reading. This constructor is one of those things
-   /*
-    * This is typical when a file is being read and existing tasks are being created
-    */
-    public TaskObj(Node task) {
-        this();
-        // Set the local node
-        this.taskNode = task;
-        // Get the attributes
-        this.taskAttributes = taskNode.getAttributes();
-
-        // Populate the attributes of this task on this object
-        populateAttributes();
-
-        // Populate the subtasks for this task
-        populateSubtasks();
     }
 
     /**
@@ -88,106 +67,44 @@ public class TaskObj {
      * Other methods
      */
 
-    // TODO: Getters and setters for subtasks
-    // TODO: Getters and setters for notes
-    // TODO: Need standardise the terminology Child or Subtask ?
-    private void populateSubtasks() {
-        TaskObj childTask;
-        TaskObj noteObj;
-
-        // Lets see if we have sub tasks
-        if(taskNode.hasChildNodes() == true) {
-            //System.out.println(taskNode.getChildNodes().getLength());
-            // Get the first subtask and store it
-            Node child = taskNode.getFirstChild();
-
-            // If we got a subtask, then lets create a TaskObj for it!
-            while(child != null) {
-                // TODO: We can probably just ignore text nodes
-                // TODO: what happens if this is only 1 charachter ?
-                if(child != null && child.getNodeType() == Node.TEXT_NODE && child.getTextContent().length() != 1) {
-                    System.out.println("text_node");
-                    System.out.println("N: " + child.getNodeName() + " T: " + child.getTextContent() + " V: " + child.getNodeValue() + " Type: " + child.getNodeType() + " L: " + child.getTextContent().length());
-                }
-                else if(child.getNodeType() == Node.ELEMENT_NODE) {
-                    // Lets see what type of node this is
-                    switch(child.getNodeName()) {
-                        case "task":
-//                          // Create a new TaskObj for the child
-                            childTask = new TaskObj(child);
-                            // Store the child in the map
-                            addChild(childTask);
-                            break;
-                        case "description":
-                            if (child.getTextContent() != null) setDescription(child.getTextContent());
-                            break;
-                        case "note":
-                            // TODO: Need to handle notes, there can be multiple notes and they should have attributes. There can also be sub-notes!
-
-                            // Create a TaskObj for this note (used because of the overlap)
-                            noteObj = new TaskObj(child);
-                            // Add the note to the notes map
-                            notesMap.put(noteObj.getID(), noteObj);
-
-/*                            // TODO: This is just diag stuff and needs to be removed along with the import
-                            System.out.println("Desc: " + noteObj.getDescription() + " USC: " + noteObj.getUnsupportedAttributeCount());
-                            for(Map.Entry<String, String> unsupItem : noteObj.getUnsupportedAttributes().entrySet()) {
-                                System.out.println(unsupItem.getKey() + " = " + unsupItem.getValue());
-                            }
-*/
-                            break;
-                        default:
-                            System.out.println("What is this? " + child.getNodeName());
-                    }
-                }
-                child = child.getNextSibling();
-            }
-        }
-    }
-
-    private void populateAttributes() {
-        String key;
-        String value;
-        unsupportedItems = new HashMap<String, String>();
-
-        for(int attrNo = 0; attrNo < taskAttributes.getLength(); attrNo++) {
-            key = taskAttributes.item(attrNo).getNodeName();
-            value = taskAttributes.item(attrNo).getNodeValue();
-
-            switch(key) {
-                case "subject":
-                    setSubject(value);
-                    break;
-                case "id":
-                    setID(value);
-                    break;
-                case "creationDateTime":
-                    setCreationDateTime(value);
-                    break;
-                case "modificationDateTime":
-                    setModificationDateTime(value);
-                    break;
-                case "status":
-                    setStatus(value);
-                    break;
-                case "expandedContexts":
-                    setExpandedContexts(value);
-                    break;
-                case "actualstartdate":
-                    setActualStartDateTime(value);
-                    break;
-                case "bgColor":
-                    setBGColor(value);
-                    break;
-                default:
-                    // If we don't match something we know about then add it to the list of unsupported items until we get code to support it
-                    unsupportedItems.put(key, value);
-            }
-        }
-    }
     /*
      * Setters
      */
+
+    public void populateAttributes(HashMap<String, String> attributes) {
+        //this.attributes = new HashMap<String, String>(attributes);
+        for(Map.Entry<String, String> attr: attributes.entrySet()) {
+            switch(attr.getKey()) {
+                case "subject":
+                    setSubject(attr.getValue());
+                    break;
+                case "id":
+                    setID(attr.getValue());
+                    break;
+                case "creationDateTime":
+                    setCreationDateTime(attr.getValue());
+                    break;
+                case "modificationDateTime":
+                    setModificationDateTime(attr.getValue());
+                    break;
+                case "status":
+                    setStatus(attr.getValue());
+                    break;
+                case "expandedContexts":
+                    setExpandedContexts(attr.getValue());
+                    break;
+                case "actualstartdate":
+                    setActualStartDateTime(attr.getValue());
+                    break;
+                case "bgColor":
+                    setBGColor(attr.getValue());
+                    break;
+                default:
+                    // If we don't match something we know about then add it to the list of unsupported items until we get code to support it
+                    unsupportedItems.put(attr.getKey(), attr.getValue());
+            }
+        }
+    }
 
     // TODO: This is private for now until I find out what this does
     /**
@@ -362,6 +279,12 @@ public class TaskObj {
 
     public void addChild(TaskObj child) {
         childMap.put(childMap.size()+1, child);
+    }
+
+    // TODO: Need to handle notes better than this
+    public void addNote(TaskObj note) {
+        // Add the note to the notes map
+        notesMap.put(note.getID(), note);
     }
     /**
      * If there are no children (subtasks) in the childMap then return true, otherwise false.
