@@ -12,18 +12,15 @@ import java.util.Map;
 public class jtaskui {
 
     public static void main(String[] args) {
-        // TODO: The UI should have support for opening a file of choice
+        // TODO: Remove the need to pass a TaskObj to the jtaskView. Its not needed anymore
         TaskObj root = new TaskObj("ROOT");
-        TaskObjXMLReader taskXMLReader = new TaskObjXMLReader(args[0], root);
-        taskXMLReader.connect();
-        root = taskXMLReader.read();
 
         // TODO: This should be done as runable
         // Create the GUI
         jtaskView jtv = new jtaskView(root);
 
         // Lets take a look at whats what!
-        printDiag(root, true);
+//        printDiag(root, true);
     }
 
     /**
