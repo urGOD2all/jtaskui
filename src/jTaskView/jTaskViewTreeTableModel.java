@@ -196,7 +196,7 @@ public class jTaskViewTreeTableModel extends AbstractTreeTableModel {
     */
    public void removeColumn(String name) {
        columnNames.remove(name);
-       fireTableStructureChanged();
+       fireTreeTableStructureChanged();
    }
 
    /**
@@ -207,7 +207,7 @@ public class jTaskViewTreeTableModel extends AbstractTreeTableModel {
     */
    public void addColumnByName(String name, int position) {
        columnNames.add(position, name);
-       fireTableStructureChanged();
+       fireTreeTableStructureChanged();
    }
 
     /**
