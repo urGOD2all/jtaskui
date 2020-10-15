@@ -5,6 +5,11 @@ import jtaskui.view.jTaskViewTreeTableModel;
 // Import the TreeTable
 import TreeTable.TreeTable;
 
+// Import the Input classes
+import jtaskui.Input.*;
+// Import the Output classes
+import jtaskui.Output.*;
+
 import javax.swing.JFrame;
 import java.awt.BorderLayout;
 import javax.swing.JMenuBar;
@@ -22,13 +27,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-// Import the Output classes
-import jtaskui.Output.*;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * This code creates the main window and adds/manages the Task Table.
  */
 public class jtaskView implements ActionListener {
+    // File chooser
+    private JFileChooser fileChooser;
     // The main window with the Task Table on it
     private JFrame rootFrame;
     // The menu bar for the rootFrame
@@ -43,11 +50,14 @@ public class jtaskView implements ActionListener {
     private TreeTable taskTreeTable;
     // The Model of the Task Table
     private jTaskViewTreeTableModel treeTableModel;
+    // The TaskObj for root that is passed to the TreeTableModel
+    private TaskObj root;
     /*
      * Constructors
      */
 
     public jtaskView(TaskObj root) {
+        this.root = root;
         // Make the frame and do some general setup
         rootFrame = new JFrame();
         rootFrame.setLayout(new BorderLayout());
@@ -113,7 +123,7 @@ public class jtaskView implements ActionListener {
         statusPanel.add(itemStatsLabel, BorderLayout.EAST);
 
         // Make a new TreeTableModel and pass the root object
-        treeTableModel = new jTaskViewTreeTableModel(root);
+        treeTableModel = new jTaskViewTreeTableModel(this.root);
         // Add the TreeTableModel to the Treetable
         taskTreeTable = new TreeTable(treeTableModel);
         // Hide the root node
@@ -238,6 +248,19 @@ public class jtaskView implements ActionListener {
 
         if(sourceEvent == fileOpen) {
             // do file chooser
+            fileChooser = new JFileChooser();
+            fileChooser.setFileFilter(new FileNameExtensionFilter("Task Coach files", "tsk"));
+            int returnVal = fileChooser.showOpenDialog(rootFrame);
+            if(returnVal == JFileChooser.APPROVE_OPTION) {
+                // Make an XML reader object
+                TaskObjXMLReader taskXMLReader = new TaskObjXMLReader(fileChooser.getSelectedFile().getAbsoluteFile().toString(), this.root);
+                // Connect to the data source
+                taskXMLReader.connect();
+                // Read the data source (this updates this.root which is passed in the constructor)
+                taskXMLReader.read();
+                // Tell the model that nodes have been inserted into the model
+                getModel().nodesWereInserted();
+            }
         }
         else if (sourceEvent == fileSave) {
             // TODO: This needs to save back to the original file
