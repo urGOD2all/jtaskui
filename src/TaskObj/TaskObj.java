@@ -35,6 +35,12 @@ public class TaskObj {
     // This is a Map of all the notes
     private HashMap<String, TaskObj> notesMap = new HashMap<String, TaskObj>();
 
+    // Used to store the parent of this task. Will be null if this is the root
+    private TaskObj parent;
+
+    // Store the number of all subtasks in the children
+    private int subTaskCount;
+
     /*
      * Constructors
      */
@@ -48,6 +54,8 @@ public class TaskObj {
         // Initialise the unsupported attributes HashMap
         unsupportedItems = new HashMap<String, String>();
         setCreationDateTime();
+        // Set initial subtasks to 0 (we are new so we have no children yet)
+        subTaskCount = 0;
     }
 
     /**
@@ -168,6 +176,15 @@ public class TaskObj {
         attributes.put("bgColor", value);
     }
 
+    /**
+     * Sets the parent to to TaskObj provided for this TaskObj.
+     *
+     * @param parent - TaskObj that is the direct parent of this TaskObj
+     */
+    public void setParent(TaskObj parent) {
+        this.parent = parent;
+    }
+
     /*
      * Getters
      */
@@ -246,8 +263,8 @@ public class TaskObj {
         return new HashMap<String, String>(unsupportedItems);
     }
 
-    /*
-     * Returns the number of subtasks for this task
+    /**
+     * Returns the number of subtasks for this task (this level only).
      */
     public int getChildCount() {
         return childMap.size();
@@ -277,8 +294,40 @@ public class TaskObj {
         return childMap.get(index);
     }
 
+    /**
+     * Returns the total number of children over all subtasks
+     */
+    public int getAllChildCount() {
+        return subTaskCount;
+    }
+
+    /**
+     * Returns the parent TaskObj for this TaskObj. Can be null if this is the root of the tree.
+     */
+    public TaskObj getParent() {
+        return parent;
+    }
+
     public void addChild(TaskObj child) {
         childMap.put(childMap.size()+1, child);
+        // Set the given parent
+        child.setParent(this);
+        // Tell the parent TaskObj that the number of children has changed
+        if (getParent() != null) getParent().incrementSubChildCount();
+        // Else, this object is the root of the tree so needs to know objects have been added at this level
+        else incrementSubChildCount();
+    }
+
+    /**
+     * Update the number of children in all the subtasks.
+     * Typically called to tell the parent that the number of total subtasks in the tree has changed.
+     * Can also be called by this object if its the root of the tree (indicated by having null parent)
+     * to increment the number of subtasks at this level.
+     */
+    public void incrementSubChildCount() {
+        subTaskCount = subTaskCount + 1;
+        // Tell the parent that the number of children has changed
+        if (parent != null) parent.incrementSubChildCount();
     }
 
     // TODO: Need to handle notes better than this
