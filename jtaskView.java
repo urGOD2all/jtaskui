@@ -46,6 +46,9 @@ public class jtaskView implements ActionListener {
     private JMenuItem fileOpen, fileSave, fileClose, fileQuit, viewColumnsCreationDate, viewColumnsModificationDate, viewColumnsDescription;
     // A scroll pane for Task Table (ensures we can scroll if the nodes or nodes that are expanded go beyond the bounds)
     private JScrollPane rootScrollpane;
+    // Labels used in the status bar
+    private JLabel itemsLabel;
+    private JLabel itemStatsLabel;
     // The Task Table
     private TreeTable taskTreeTable;
     // The Model of the Task Table
@@ -116,8 +119,8 @@ public class jtaskView implements ActionListener {
         // Set the layout
         statusPanel.setLayout(new BorderLayout());
         // Create a JLabel to display the text of the status panel
-        JLabel itemsLabel = new JLabel("Will display total number of items etc");
-        JLabel itemStatsLabel = new JLabel("Will display number of overdue items etc");
+        itemsLabel = new JLabel("Will display total number of items etc");
+        itemStatsLabel = new JLabel("Will display number of overdue items etc");
         // Add the label to the panel
         statusPanel.add(itemsLabel, BorderLayout.WEST);
         statusPanel.add(itemStatsLabel, BorderLayout.EAST);
@@ -260,6 +263,7 @@ public class jtaskView implements ActionListener {
                 taskXMLReader.read();
                 // Tell the model that nodes have been inserted into the model
                 getModel().nodesWereInserted();
+                itemsLabel.setText("Tasks: " + this.root.getAllChildCount() + " total");
             }
         }
         else if (sourceEvent == fileSave) {
