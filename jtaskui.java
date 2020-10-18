@@ -6,7 +6,6 @@ import javax.swing.SwingUtilities;
 import java.util.Map;
 
 /* TODO:
-   * Remove all code that handles XML from TaskObj and move to a XML processing class. This will hopefully allow for changing the output format easily
    * When will we save, auto like TaskCoach or manual or both
  */
 public class jtaskui {
