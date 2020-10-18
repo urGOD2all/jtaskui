@@ -59,8 +59,22 @@ public class jtaskView implements ActionListener {
      * Constructors
      */
 
+    /**
+     * Default constructor
+     */
+    public jtaskView() {
+        this.root = new TaskObj("ROOT");
+    }
+
+    /**
+     * Constructor to take a prepopulated TaskObj.
+     */
+    @Deprecated
     public jtaskView(TaskObj root) {
         this.root = root;
+    }
+
+    public void initGUI() {
         // Make the frame and do some general setup
         rootFrame = new JFrame();
         rootFrame.setLayout(new BorderLayout());

@@ -1,6 +1,6 @@
 package jtaskui;
 
-import jtaskui.Input.TaskObjXMLReader;
+import javax.swing.SwingUtilities;
 
 // TODO: This is only needed because of the diag printing code
 import java.util.Map;
@@ -12,12 +12,14 @@ import java.util.Map;
 public class jtaskui {
 
     public static void main(String[] args) {
-        // TODO: Remove the need to pass a TaskObj to the jtaskView. Its not needed anymore
-        TaskObj root = new TaskObj("ROOT");
-
-        // TODO: This should be done as runable
         // Create the GUI
-        jtaskView jtv = new jtaskView(root);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                jtaskView jtv = new jtaskView();
+                jtv.initGUI();
+            }
+        });
 
         // Lets take a look at whats what!
 //        printDiag(root, true);
