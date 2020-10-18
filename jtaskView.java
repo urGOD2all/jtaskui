@@ -36,6 +36,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class jtaskView implements ActionListener {
     // File chooser
     private JFileChooser fileChooser;
+    // File that was opened
+    private String taskFilePath;
     // The main window with the Task Table on it
     private JFrame rootFrame;
     // The menu bar for the rootFrame
@@ -101,7 +103,6 @@ public class jtaskView implements ActionListener {
         // The "View" menu bar item
         view = new JMenu("View");
         viewColumns = new JMenu("Columns");
-        // TODO: Need to sort out a list of columns somewhere, maybe TaskObj ?
         viewColumnsCreationDate = new JMenuItem("Creation Date");
         viewColumnsCreationDate.addActionListener(this);
         viewColumnsModificationDate = new JMenuItem("Modification Date");
@@ -269,8 +270,9 @@ public class jtaskView implements ActionListener {
             fileChooser.setFileFilter(new FileNameExtensionFilter("Task Coach files", "tsk"));
             int returnVal = fileChooser.showOpenDialog(rootFrame);
             if(returnVal == JFileChooser.APPROVE_OPTION) {
+                taskFilePath = fileChooser.getSelectedFile().getAbsoluteFile().toString();
                 // Make an XML reader object
-                TaskObjXMLReader taskXMLReader = new TaskObjXMLReader(fileChooser.getSelectedFile().getAbsoluteFile().toString(), this.root);
+                TaskObjXMLReader taskXMLReader = new TaskObjXMLReader(taskFilePath, this.root);
                 // Connect to the data source
                 taskXMLReader.connect();
                 // Read the data source (this updates this.root which is passed in the constructor)
@@ -283,6 +285,7 @@ public class jtaskView implements ActionListener {
         else if (sourceEvent == fileSave) {
             // TODO: This needs to save back to the original file
             TaskObjXMLWriter save = new TaskObjXMLWriter("./test.tsk", getModel().getRoot());
+            //TaskObjXMLWriter save = new TaskObjXMLWriter(taskFilePath, getModel().getRoot());
             save.connect();
             if(save.isConnected()) {
                 save.write();
