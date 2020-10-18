@@ -45,7 +45,7 @@ public class jtaskView implements ActionListener {
     // The menus for the rootFrame
     private JMenu file, view, viewColumns;
     // The menu items for the rootFrame menus
-    private JMenuItem fileOpen, fileSave, fileClose, fileQuit, viewColumnsCreationDate, viewColumnsModificationDate, viewColumnsDescription;
+    private JMenuItem fileOpen, fileSave, fileSaveAs, fileClose, fileQuit, viewColumnsCreationDate, viewColumnsModificationDate, viewColumnsDescription;
     // A scroll pane for Task Table (ensures we can scroll if the nodes or nodes that are expanded go beyond the bounds)
     private JScrollPane rootScrollpane;
     // Labels used in the status bar
@@ -90,13 +90,19 @@ public class jtaskView implements ActionListener {
         fileOpen.addActionListener(this);
         fileSave = new JMenuItem("Save");
         fileSave.addActionListener(this);
+        fileSave.setEnabled(false);
+        fileSaveAs = new JMenuItem("Save As");
+        fileSaveAs.addActionListener(this);
+        fileSaveAs.setEnabled(false);
         fileClose = new JMenuItem("Close");
         fileClose.addActionListener(this);
+        fileClose.setEnabled(false);
         fileQuit = new JMenuItem("Quit");
         fileQuit.addActionListener(this);
         // Build the File menu
         file.add(fileOpen);
         file.add(fileSave);
+        file.add(fileSaveAs);
         file.add(fileClose);
         file.add(fileQuit);
 
@@ -270,6 +276,7 @@ public class jtaskView implements ActionListener {
             fileChooser.setFileFilter(new FileNameExtensionFilter("Task Coach files", "tsk"));
             int returnVal = fileChooser.showOpenDialog(rootFrame);
             if(returnVal == JFileChooser.APPROVE_OPTION) {
+                // Store the file path that was opened
                 taskFilePath = fileChooser.getSelectedFile().getAbsoluteFile().toString();
                 // Make an XML reader object
                 TaskObjXMLReader taskXMLReader = new TaskObjXMLReader(taskFilePath, this.root);
@@ -279,21 +286,53 @@ public class jtaskView implements ActionListener {
                 taskXMLReader.read();
                 // Tell the model that nodes have been inserted into the model
                 getModel().nodesWereInserted();
+                // Update the status bar
                 itemsLabel.setText("Tasks: " + this.root.getAllChildCount() + " total");
+                // If this is a merge we need to disable the save option so because it is not known which file to save to.
+                if (fileOpen.getText() == "Merge") {
+                    fileSave.setEnabled(false);
+                }
+                else {
+                    fileSave.setEnabled(true);
+                }
+                // Update the item text to show future opens will merge
+                fileOpen.setText("Merge");
+                fileSaveAs.setEnabled(true);
+                fileClose.setEnabled(true);
             }
         }
         else if (sourceEvent == fileSave) {
-            // TODO: This needs to save back to the original file
-            TaskObjXMLWriter save = new TaskObjXMLWriter("./test.tsk", getModel().getRoot());
-            //TaskObjXMLWriter save = new TaskObjXMLWriter(taskFilePath, getModel().getRoot());
+            TaskObjXMLWriter save = new TaskObjXMLWriter(taskFilePath, getModel().getRoot());
             save.connect();
             if(save.isConnected()) {
                 save.write();
                 save.disconnect();
             }
         }
+        else if (sourceEvent == fileSaveAs) {
+            // File chooser
+            fileChooser = new JFileChooser();
+            fileChooser.setFileFilter(new FileNameExtensionFilter("Task Coach files", "tsk"));
+            int returnVal = fileChooser.showSaveDialog(rootFrame);
+            if(returnVal == JFileChooser.APPROVE_OPTION) {
+                // Store the file path that was opened
+                taskFilePath = fileChooser.getSelectedFile().getAbsoluteFile().toString();
+                // Fix the extention if the user didnt type it
+                if( ! taskFilePath.endsWith(".tsk")) taskFilePath = taskFilePath + ".tsk";
+                // Save to the specified file
+                TaskObjXMLWriter save = new TaskObjXMLWriter(taskFilePath, getModel().getRoot());
+                save.connect();
+                if(save.isConnected()) {
+                    save.write();
+                    save.disconnect(); 
+                }
+                // Enable the save option again
+                fileSave.setEnabled(true);
+            }
+        }
         else if (sourceEvent == fileClose) {
-            // do reset of TreeTable, close file handles etc etc....
+            // TODO: do reset of TreeTable, close file handles etc etc....
+            fileOpen.setText("Open");
         }
         else if(sourceEvent == fileQuit) {
             // Time to exit
