@@ -107,6 +107,9 @@ public class TaskObj {
                 case "bgColor":
                     setBGColor(attr.getValue());
                     break;
+                case "priority":
+                    setPriority(attr.getValue());
+                    break;
                 default:
                     // If we don't match something we know about then add it to the list of unsupported items until we get code to support it
                     unsupportedItems.put(attr.getKey(), attr.getValue());
@@ -150,6 +153,10 @@ public class TaskObj {
 
     public void setSubject(String value) {
         attributes.put("subject", value);
+    }
+
+    public void setPriority(String value) {
+        attributes.put("priority", value);
     }
 
     /*
@@ -229,6 +236,10 @@ public class TaskObj {
 
     public String getDescription() {
         return description;
+    }
+
+    public String getPriority() {
+        return getAttribute("priority");
     }
 
     // TODO: Should return some kind of date time object
