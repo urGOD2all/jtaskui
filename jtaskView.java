@@ -10,6 +10,10 @@ import jtaskui.Input.*;
 // Import the Output classes
 import jtaskui.Output.*;
 
+import jtaskview.ui.jTaskEdit;
+
+import javax.swing.SwingUtilities;
+
 import javax.swing.JFrame;
 import java.awt.BorderLayout;
 import javax.swing.JMenuBar;
@@ -57,6 +61,7 @@ public class jtaskView implements ActionListener {
     private jTaskViewTreeTableModel treeTableModel;
     // The TaskObj for root that is passed to the TreeTableModel
     private TaskObj root;
+
     /*
      * Constructors
      */
@@ -154,28 +159,29 @@ public class jtaskView implements ActionListener {
         taskTreeTable.setRootVisible(false);
         // Make sure all the chidlren have a expansion handles
         taskTreeTable.setShowsRootHandles(true);
-/*
-        // TODO: Fix this derpy code. It does work to return what row was clicked on and is currently used to test hiding/showing cols
+
+        // TODO: Should this be here ?
         taskTreeTable.addMouseListener(new MouseAdapter() {
-         public void mouseClicked(MouseEvent me) {
-            if (me.getClickCount() == 2) {     // to detect doble click events
-                int selectedRow = getTaskTable().getSelectedRow();
-                int selectedColumn = getTaskTable().getSelectedColumn();
-                if(i == 0) {
-//                    TODO: The model is missing the ability to identify a row and get the value on it like a JTable would be able to do
-//                    System.out.println(getModel().getValueAt(selectedRow, selectedColumn));
-                    showColumn("Creation Date",1);
-                    i = 1;
+            public void mouseClicked(MouseEvent me) {
+                // Detect double click events
+                if (me.getClickCount() == 2) {
+                    // Get the selected row
+                    int selectedRow = getTaskTable().getSelectedRow();
+                    // get the TaskObj powering that row
+                    TaskObj selectedTask = (TaskObj) getModel().nodeForRow(selectedRow);
+
+                    // Invoke a thread for the edit frame
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            jTaskEdit jte = new jTaskEdit(selectedTask);
+                            jte.initGUI();
+                        }
+                    });
                 }
-                else {
-                    hideColumn(1);
-                    i = 0;
-                }
-                
-            }   
-         }   
-      }); 
-*/
+            }
+        }); 
+
         // Add the TreeTable to the scroll pane
         JScrollPane rootScrollpane = new JScrollPane(taskTreeTable);
         // Add the scroll pane to the JFrame
