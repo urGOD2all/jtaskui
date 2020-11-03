@@ -139,10 +139,10 @@ public class jTaskEdit implements ActionListener {
 
         // Creation date
         creationDateLabel = new JLabel("Creation Date");
-        creationDate = new JLabel(task.getCreationDateTime());
+        creationDate = new JLabel(task.getFormattedCreationDateTime());
         // Modification date
         modificationDateLabel = new JLabel("Modification Date");
-        modificationDate = new JLabel(task.getModificationDateTime());
+        modificationDate = new JLabel(task.getFormattedModificationDateTime());
 
         // Add the labels and the data to the correct locations
         westPanel.add(subjectLabel, BorderLayout.NORTH);
