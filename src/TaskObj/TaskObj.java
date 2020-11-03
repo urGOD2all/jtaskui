@@ -7,6 +7,10 @@ import java.util.Map;
 
 import java.util.UUID;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
 // TODO: Interesting observation, my test setup has Tasks with IDs that are mostly the same, look into this further
 // TODO: as we now use this for notes as there is much overlap, we should consider perhaps having an enum to tell us what type of object this is ?
 public class TaskObj {
@@ -41,6 +45,9 @@ public class TaskObj {
     // Store the number of all subtasks in the children
     private int subTaskCount;
 
+    // Formatter objects for converting the date time format from XML and the display format
+    private DateTimeFormatter readInDateFormat, dateDisplayFormat;
+
     /*
      * Constructors
      */
@@ -56,6 +63,10 @@ public class TaskObj {
         setCreationDateTime();
         // Set initial subtasks to 0 (we are new so we have no children yet)
         subTaskCount = 0;
+        // Create a formatter for reading in from the file.
+        readInDateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.nnnnnn");
+        // Create a formater that for display purposes
+        dateDisplayFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     }
 
     /**
@@ -242,14 +253,71 @@ public class TaskObj {
         return getAttribute("priority");
     }
 
-    // TODO: Should return some kind of date time object
+    /**
+     * Helper to handle parsing of dates and times to LocalDateTime objects
+     *
+     * Note: If parsing fails an error will be emitted to standard error and the date and time now will be returned instead.
+     *
+     * @param dateTime - String representation of the date and time to parse
+     * @param inFormat - DateTimeFormatter in the format of dateTime
+     * @return LocalDateTime - parsed to the XML format "yyyy-MM-dd HH:mm:ss.nnnnnn"
+     */
+    private LocalDateTime parseDateTime(String dateTime, DateTimeFormatter inFormat) {
+        try {
+            return LocalDateTime.parse(dateTime, inFormat);
+        }
+        catch (DateTimeParseException e) {
+            System.err.println("ERROR: Failed to parse " + dateTime + " - Expected format " + inFormat);
+            return LocalDateTime.now();
+        }
+    }
+
+    /**
+     * Helper to handle parsing dates and times to String output format
+     *
+     * Note: If parsing fails an error will be emitted to standard error and the date and time now will be returned instead.
+     *
+     * @param dateTime - String representation of the date and time to parse
+     * @return String - dateTime parsed to the display format "yyyy-MM-dd HH:mm"
+     */
+    private String getFormattedDateTime(String dateTime) {
+        return LocalDateTime.parse(dateTime, readInDateFormat).format(dateDisplayFormat);
+    }
+
+    /**
+     * Returns a String representation of the creationDateTime attribute. This is the raw value from the XML.
+     *
+     * @return String - the raw creation date and time attribute from the XML
+     */
     public String getCreationDateTime() {
         return getAttribute("creationDateTime");
     }
 
-    // TODO: Should return some kind of date time object
+    /**
+     * Returns a String representation of the creationDateTime attribute in the display format.
+     *
+     * @return String - Formatted Date and Time
+     */
+    public String getFormattedCreationDateTime() {
+        return getFormattedDateTime(getCreationDateTime());
+    }
+
+    /**
+     * Returns a String representation of the modificationDateTime attribute. This is the raw value from the XML.
+     *
+     * @return String - the raw modification date and time attribute from the XML
+     */
     public String getModificationDateTime() {
         return getAttribute("modificationDateTime");
+    }
+
+    /**
+     * Returns a String representation of the modificationDateTime attribute in the display format.
+     *
+     * @return String - Formatted Date and Time
+     */
+    public String getFormattedModificationDateTime() {
+        return getFormattedDateTime(getModificationDateTime());
     }
 
     public String getActualStartDateTime() {
