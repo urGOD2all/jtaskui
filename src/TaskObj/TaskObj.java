@@ -138,8 +138,6 @@ public class TaskObj {
         attributes.put("status", value);
     }
 
-    // TODO: Considering it will always be read from the XML file as a String, perhaps a getter should be available to return this as a Date? The only reason I think this might be needed is in the GUI but I might just handle it there...
-    // TODO: Need to create a proper dt object
     /*
      * This is only used within the class when a new task is created.
      */
@@ -147,17 +145,14 @@ public class TaskObj {
         setCreationDateTime("now");
     }
 
-    // TODO: Need to take a proper dt object
     public void setCreationDateTime(String value) {
         attributes.put("creationDateTime", value);
     }
 
-    // TODO: Need to take a proper dt object
     public void setModificationDateTime(String value) {
         attributes.put("modificationDateTime", value);
     }
 
-    // TODO: Need to take a proper dt object
     public void setActualStartDateTime(String value) {
         attributes.put("actualstartdate", value);
     }
@@ -320,10 +315,29 @@ public class TaskObj {
         return getFormattedDateTime(getModificationDateTime());
     }
 
+    /**
+     * Returns a String representation of the actualStartDateTime attribute. This is the raw value from the XML.
+     *
+     * @return String - the raw actual start date and time attribute from the XML
+     */
     public String getActualStartDateTime() {
         return getAttribute("actualStartDateTime");
     }
 
+    /**
+     * Returns a String representation of the actualStartDateTime attribute in the display format.
+     *
+     * @return String - Formatted Date and Time
+     */
+    public String getFormattedActualStartDateTime() {
+        return getFormattedDateTime(getActualStartDateTime());
+    }
+
+    /**
+     * Returns a copy of the task attributes
+     *
+     * @return HashMap<String, String> - Attributes for this task
+     */
     public HashMap<String, String> getAttributes() {
         return new HashMap<String, String>(attributes);
     }
