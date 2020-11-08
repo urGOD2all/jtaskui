@@ -14,6 +14,7 @@ import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
 import javax.swing.JSpinner;
+import javax.swing.JCheckBox;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -23,7 +24,7 @@ public class jTaskEdit implements ActionListener {
     private JFrame editFrame;
     private JTabbedPane tPane;
     private JButton closeEditFrame;
-    private JPanel editPanel, descPanel, datePanel, prereqsPanel, progressPanel, categoriesPanel, budgetPanel, effortPanel, notesPanel, attachmentsPanel, appearancePanel;
+    private JPanel editPanel, descPanel, datesPanel, prereqsPanel, progressPanel, categoriesPanel, budgetPanel, effortPanel, notesPanel, attachmentsPanel, appearancePanel;
     private JLabel subjectLabel, descriptionLabel, creationDateLabel, creationDate, modificationDateLabel, modificationDate;
     private JTextArea subject, description;
     private JScrollPane descScroll;
@@ -66,7 +67,6 @@ public class jTaskEdit implements ActionListener {
         efSouthEast.add(closeEditFrame, BorderLayout.EAST);
 
         // Create panels for each tab
-        datePanel = new JPanel(new BorderLayout());
         prereqsPanel = new JPanel(new BorderLayout());
         progressPanel = new JPanel(new BorderLayout());
         categoriesPanel = new JPanel(new BorderLayout());
@@ -78,9 +78,9 @@ public class jTaskEdit implements ActionListener {
 
         // Build each tab
         initDescTab();
+        initDatesTab();
 
         // Add the panels and create the tabs
-        tPane.addTab("Dates", datePanel);
         tPane.addTab("Prerequisites", prereqsPanel);
         tPane.addTab("Progress", progressPanel);
         tPane.addTab("Categories", categoriesPanel);
@@ -169,6 +169,70 @@ public class jTaskEdit implements ActionListener {
 
         // Add the Description panel to the tPane
         tPane.addTab("Description", descPanel);
+    }
+
+    public void initDatesTab() {
+
+        datesPanel = new JPanel();
+        LayoutManager lm = new LayoutManager(datesPanel);
+
+        JLabel plannedStartDateLabel = new JLabel("Planned start date");
+        JCheckBox plannedStartDateCheck = new JCheckBox();
+        // TODO: FIX ME
+        JTextArea plannedStartDate = new JTextArea(task.getFormattedModificationDateTime());
+        //JTextArea plannedStartDate = new JTextArea(task.getPlannedStartDate());
+
+        lm.addNext(plannedStartDateLabel);
+        lm.addNext(plannedStartDateCheck);
+        lm.addNext(plannedStartDate);
+
+        JLabel dueDateLabel = new JLabel("Due date");
+        JCheckBox dueDateCheck = new JCheckBox();
+        // TODO: FIX ME
+        JTextArea dueDate = new JTextArea(task.getFormattedModificationDateTime());
+
+        lm.addNextRow(dueDateLabel);
+        lm.addNext(dueDateCheck);
+        lm.addNext(dueDate);
+
+        lm.addSeparator();
+
+        JLabel actualStartDateLabel = new JLabel("Actual start date");
+        JCheckBox actualStartDateCheck = new JCheckBox();
+        JTextArea actualStartDate = new JTextArea(task.getFormattedActualStartDateTime());
+
+        lm.addNext(actualStartDateLabel);
+        lm.addNext(actualStartDateCheck);
+        lm.addNext(actualStartDate);
+
+        JLabel completionDateLabel = new JLabel("Completion date");
+        JCheckBox completionDateCheck = new JCheckBox();
+        // TODO: FIX ME
+        JTextArea completionDate = new JTextArea(task.getFormattedActualStartDateTime());
+
+        lm.addNextRow(completionDateLabel);
+        lm.addNext(completionDateCheck);
+        lm.addNext(completionDate);
+
+        lm.addSeparator();
+
+        JLabel reminderLabel = new JLabel("Reminder");
+        JCheckBox reminderCheck = new JCheckBox();
+        // TODO: FIX ME
+        JTextArea reminderDate = new JTextArea(task.getFormattedActualStartDateTime());
+
+        lm.addNext(reminderLabel);
+        lm.addNext(reminderCheck);
+        lm.addNext(reminderDate);
+
+        lm.addSeparator();
+
+        JLabel recurrenceLabel = new JLabel("Recurrence");
+
+        lm.addNext(recurrenceLabel);
+
+        // Add the Dates panel to the tPane
+        tPane.addTab("Dates", datesPanel);
     }
 
     public void actionPerformed(ActionEvent e) {
