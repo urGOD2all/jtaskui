@@ -273,10 +273,16 @@ public class TaskObj {
      * Note: If parsing fails an error will be emitted to standard error and the date and time now will be returned instead.
      *
      * @param dateTime - String representation of the date and time to parse
-     * @return String - dateTime parsed to the display format "yyyy-MM-dd HH:mm"
+     * @return String - dateTime parsed to the display format "yyyy-MM-dd HH:mm" or "N/A" when input is null
      */
     private String getFormattedDateTime(String dateTime) {
-        return LocalDateTime.parse(dateTime, readInDateFormat).format(dateDisplayFormat);
+        try {
+            return LocalDateTime.parse(dateTime, readInDateFormat).format(dateDisplayFormat);
+        }
+        catch(NullPointerException npe) {
+            // This attribute is absent so return N/A which is what formatted field dates look like when they are absent
+            return "N/A";
+        }
     }
 
     /**
