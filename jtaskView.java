@@ -34,6 +34,9 @@ import java.awt.event.MouseEvent;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+// TODO: Remove this when the diag code is removed
+import java.util.Map;
+
 /**
  * This code creates the main window and adds/manages the Task Table.
  */
@@ -305,6 +308,8 @@ public class jtaskView implements ActionListener {
                 fileOpen.setText("Merge");
                 fileSaveAs.setEnabled(true);
                 fileClose.setEnabled(true);
+                // TODO: Let see whats what
+                printDiag(this.root, true);
             }
         }
         else if (sourceEvent == fileSave) {
@@ -354,5 +359,32 @@ public class jtaskView implements ActionListener {
         else if(sourceEvent == viewColumnsDescription) {
             toggleColumnVisible("Description",3);
         }
+    }
+
+    /**
+     * Some really smelly code to print some diag stuff so I can see whats what.
+     * This will be removed later
+     * TODO: Of the information shown here, some of it will need to go into the Status bar, other stuff might live somewhere else
+     */
+    private static int printDiag(TaskObj tasks, boolean isRoot) {
+        int i=0;
+        int childCount=0;
+
+        while (i<tasks.getChildCount()) {
+            i = i + 1;
+            // Call ourself so we can have a deep look
+            childCount+=printDiag(tasks.getChildAt(i), false);
+
+            // TODO: This is diag and will need to be clean. Maybe I can add this to part of the UI later
+            for(Map.Entry<String, String> unsupItem : tasks.getChildAt(i).getUnsupportedAttributes().entrySet()) {
+                System.out.println("Unsupported items for ID: " + tasks.getChildAt(i).getID() + " - " + unsupItem.getKey() + " = " + unsupItem.getValue());
+            }
+        }
+
+        if(isRoot == true) {
+            System.out.println("In root = " + tasks.getChildCount());
+            System.out.println("All children count = " + (i+childCount));
+        }
+        return (i+childCount);
     }
 }
