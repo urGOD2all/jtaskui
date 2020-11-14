@@ -45,7 +45,7 @@ public class TaskObj {
     // Store the number of all subtasks in the children
     private int subTaskCount;
 
-    // Formatter objects for converting the date time format from XML and the display format
+    // Formatter objects for converting the date time format from TaskCoach stored format and the display format
     private DateTimeFormatter readInDateFormat, dateDisplayFormat;
 
     /*
@@ -106,6 +106,15 @@ public class TaskObj {
                 case "modificationDateTime":
                     setModificationDateTime(attr.getValue());
                     break;
+                case "duedate":
+                    setDueDateTime(attr.getValue());
+                    break;
+                case "plannedstartdate":
+                    setPlannedStartDateTime(attr.getValue());
+                    break;
+                case "completiondate":
+                    setCompletionDateTime(attr.getValue());
+                    break;
                 case "status":
                     setStatus(attr.getValue());
                     break;
@@ -114,6 +123,9 @@ public class TaskObj {
                     break;
                 case "actualstartdate":
                     setActualStartDateTime(attr.getValue());
+                    break;
+                case "percentageComplete":
+                    setPercentageComplete(attr.getValue());
                     break;
                 case "bgColor":
                     setBGColor(attr.getValue());
@@ -153,8 +165,24 @@ public class TaskObj {
         attributes.put("modificationDateTime", value);
     }
 
+    public void setDueDateTime(String value) {
+        attributes.put("duedate", value);
+    }
+
+    public void setPlannedStartDateTime(String value) {
+        attributes.put("plannedstartdate", value);
+    }
+
     public void setActualStartDateTime(String value) {
         attributes.put("actualstartdate", value);
+    }
+
+    public void setCompletionDateTime(String value) {
+        attributes.put("completiondate", value);
+    }
+
+    public void setPercentageComplete(String value) {
+        attributes.put("percentageComplete", value);
     }
 
     public void setSubject(String value) {
@@ -204,6 +232,7 @@ public class TaskObj {
 
     /**
      * Method to return an attributes value given an attribute name.
+     * This method returns raw values as stored in the datasource as Strings.
      *
      * @param name - String representing an attribute name
      *
@@ -255,7 +284,7 @@ public class TaskObj {
      *
      * @param dateTime - String representation of the date and time to parse
      * @param inFormat - DateTimeFormatter in the format of dateTime
-     * @return LocalDateTime - parsed to the XML format "yyyy-MM-dd HH:mm:ss.nnnnnn"
+     * @return LocalDateTime - parsed to the TaskCoach format "yyyy-MM-dd HH:mm:ss.nnnnnn"
      */
     private LocalDateTime parseDateTime(String dateTime, DateTimeFormatter inFormat) {
         try {
@@ -286,9 +315,9 @@ public class TaskObj {
     }
 
     /**
-     * Returns a String representation of the creationDateTime attribute. This is the raw value from the XML.
+     * Returns a String representation of the creationDateTime attribute. This is the raw value from the datasource.
      *
-     * @return String - the raw creation date and time attribute from the XML
+     * @return String - the raw creation date and time attribute from the datasource
      */
     public String getCreationDateTime() {
         return getAttribute("creationDateTime");
@@ -304,9 +333,9 @@ public class TaskObj {
     }
 
     /**
-     * Returns a String representation of the modificationDateTime attribute. This is the raw value from the XML.
+     * Returns a String representation of the modificationDateTime attribute. This is the raw value from the datasource.
      *
-     * @return String - the raw modification date and time attribute from the XML
+     * @return String - the raw modification date and time attribute from the datasource
      */
     public String getModificationDateTime() {
         return getAttribute("modificationDateTime");
@@ -322,9 +351,29 @@ public class TaskObj {
     }
 
     /**
-     * Returns a String representation of the actualStartDateTime attribute. This is the raw value from the XML.
+     * Returns a String represenation of the duedate attribute. This is the raw value from the datasource.
      *
-     * @return String - the raw actual start date and time attribute from the XML
+     * @return String - the raw due date and time attribute from the datasource.
+     */
+    public String getDueDateTime() {
+        return getAttribute("duedate");
+    }
+
+    /**
+     * Returns a String representation of the duedate attribute in the display format.
+     * At the moment the stored format and display format is the same we here we do no formatting other than existance checking.
+     *
+     * @return String - Formatted Date and Time
+     */
+    public String getFormattedDueDateTime() {
+        if (hasAttribute("duedate")) return getAttribute("duedate");
+        else return "N/A";
+    }
+
+    /**
+     * Returns a String representation of the actualStartDateTime attribute. This is the raw value from the datasource.
+     *
+     * @return String - the raw actual start date and time attribute from the datasource.
      */
     public String getActualStartDateTime() {
         return getAttribute("actualStartDateTime");
@@ -337,6 +386,57 @@ public class TaskObj {
      */
     public String getFormattedActualStartDateTime() {
         return getFormattedDateTime(getActualStartDateTime());
+    }
+
+    /**
+     * Returns a String represenation of the plannedstartdate attribute, This is the raw value from the datasource.
+     *
+     * @return String - the raw planned start date and time attribute from the datasource.
+     */
+    public String getPlannedStartDateTime() {
+        return getAttribute("plannedstartdate");
+    }
+
+    /**
+     * Returns a String representation of the plannedstartdate attribute in display format.
+     *
+     * @return String - Formatted Date and Time
+     */
+    public String getFormattedPlannedStartDate() {
+        return getFormattedDateTime(getPlannedStartDateTime());
+    }
+
+    /**
+     * Returns a String representation of the completiondate attribute. This is the raw value from the datasource.
+     *
+     * @return String - the raw completion date and time attribute from the datasource.
+     */
+    public String getCompletionDateTime() {
+        return getAttribute("completiondate");
+    }
+
+    /**
+     * Returns a String represenation of the completiondate attribute in the display format.
+     *
+     * @return String - Formatted Date and Time
+     */
+    public String getFormattedCompletionDateTime() {
+        return getFormattedDateTime(getCompletionDateTime());
+    }
+
+    /**
+     * Returns the percentage completion of this TaskObj
+     *
+     * @return int - percentage of TaskObj completion.
+     */
+    public int getPercentageComplete() {
+        try {
+            return Integer.parseInt(getAttribute("percentageComplete"));
+        }
+        catch(NumberFormatException nfe) {
+            // Attribute doesn't exist, return 0
+            return 0;
+        }
     }
 
     /**
@@ -442,6 +542,16 @@ public class TaskObj {
     public boolean hasChildren() {
         if (childMap.size() == 0) return false;
         return true;
+    }
+
+    /**
+     * Returns true if the attribute exists for this TaskObj, false otherwise.
+     *
+     * @param attribute - String name of attribute
+     * @return boolean - true if the attribute exists on this TaskObj, false otherwise
+     */
+    private boolean hasAttribute(String attribute) {
+        return attributes.containsKey(attribute);
     }
 
     public boolean hasDescription() {
