@@ -178,9 +178,7 @@ public class jTaskEdit implements ActionListener {
 
         JLabel plannedStartDateLabel = new JLabel("Planned start date");
         JCheckBox plannedStartDateCheck = new JCheckBox();
-        // TODO: FIX ME
-        JTextArea plannedStartDate = new JTextArea(task.getFormattedModificationDateTime());
-        //JTextArea plannedStartDate = new JTextArea(task.getPlannedStartDate());
+        JTextArea plannedStartDate = new JTextArea(task.getFormattedPlannedStartDate());
 
         lm.addNext(plannedStartDateLabel);
         lm.addNext(plannedStartDateCheck);
@@ -188,8 +186,7 @@ public class jTaskEdit implements ActionListener {
 
         JLabel dueDateLabel = new JLabel("Due date");
         JCheckBox dueDateCheck = new JCheckBox();
-        // TODO: FIX ME
-        JTextArea dueDate = new JTextArea(task.getFormattedModificationDateTime());
+        JTextArea dueDate = new JTextArea(task.getFormattedDueDateTime());
 
         lm.addNextRow(dueDateLabel);
         lm.addNext(dueDateCheck);
@@ -207,8 +204,7 @@ public class jTaskEdit implements ActionListener {
 
         JLabel completionDateLabel = new JLabel("Completion date");
         JCheckBox completionDateCheck = new JCheckBox();
-        // TODO: FIX ME
-        JTextArea completionDate = new JTextArea(task.getFormattedActualStartDateTime());
+        JTextArea completionDate = new JTextArea(task.getFormattedCompletionDateTime());
 
         lm.addNextRow(completionDateLabel);
         lm.addNext(completionDateCheck);
