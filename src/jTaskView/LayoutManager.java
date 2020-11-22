@@ -41,7 +41,14 @@ public class LayoutManager {
      * Places addComponent onto destComponent in the next available position on this row.
      */
     public void addNext(JComponent addComponent) {
-        addComponent(addComponent, currentCol, currentRow, 1, 1, 0.0, 0.5, GridBagConstraints.FIRST_LINE_START, GridBagConstraints.NONE);
+        addNext(addComponent, currentCol, currentRow, 1, 1, 0.0, 0.5, GridBagConstraints.FIRST_LINE_START, GridBagConstraints.NONE);
+    }
+
+    /**
+     * Internal helper for addNext
+     */
+    private void addNext(JComponent addComponent, int gridx, int gridy, int gridwidth, int gridheight, double weightx, double weighty, int anchor, int fill) {
+        addComponent(addComponent, gridx, gridy, gridwidth, gridheight, weightx, weighty, anchor, fill);
         currentCol = currentCol + 1;
     }
 
