@@ -1,6 +1,8 @@
 package jtaskview.ui;
 
 import jtaskui.TaskObj;
+import jTaskUI.jTaskEdit.tabs.datesTab;
+import jTaskUI.jTaskEdit.tabs.notesTab;
 
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
@@ -14,7 +16,6 @@ import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
 import javax.swing.JSpinner;
-import javax.swing.JCheckBox;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -24,7 +25,7 @@ public class jTaskEdit implements ActionListener {
     private JFrame editFrame;
     private JTabbedPane tPane;
     private JButton closeEditFrame;
-    private JPanel editPanel, descPanel, datesPanel, prereqsPanel, progressPanel, categoriesPanel, budgetPanel, effortPanel, notesPanel, attachmentsPanel, appearancePanel;
+    private JPanel editPanel, descPanel;
     private JLabel subjectLabel, descriptionLabel, creationDateLabel, creationDate, modificationDateLabel, modificationDate;
     private JTextArea subject, description;
     private JScrollPane descScroll;
@@ -66,29 +67,21 @@ public class jTaskEdit implements ActionListener {
         closeEditFrame.addActionListener(this);
         efSouthEast.add(closeEditFrame, BorderLayout.EAST);
 
-        // Create panels for each tab
-        prereqsPanel = new JPanel(new BorderLayout());
-        progressPanel = new JPanel(new BorderLayout());
-        categoriesPanel = new JPanel(new BorderLayout());
-        budgetPanel = new JPanel(new BorderLayout());
-        effortPanel = new JPanel(new BorderLayout());
-        notesPanel = new JPanel(new BorderLayout());
-        attachmentsPanel = new JPanel(new BorderLayout());
-        appearancePanel = new JPanel(new BorderLayout());
-
         // Build each tab
         initDescTab();
-        initDatesTab();
+        datesTab dat = new datesTab(task);
+        tPane.addTab("Dates", dat.buildPanel());
 
         // Add the panels and create the tabs
-        tPane.addTab("Prerequisites", prereqsPanel);
-        tPane.addTab("Progress", progressPanel);
-        tPane.addTab("Categories", categoriesPanel);
-        tPane.addTab("Budget", budgetPanel);
-        tPane.addTab("Effort", effortPanel);
-        tPane.addTab("Notes", notesPanel);
-        tPane.addTab("Attachments", attachmentsPanel);
-        tPane.addTab("Appearance", appearancePanel);
+        tPane.addTab("Prerequisites", new JPanel());
+        tPane.addTab("Progress", new JPanel());
+        tPane.addTab("Categories", new JPanel());
+        tPane.addTab("Budget", new JPanel());
+        tPane.addTab("Effort", new JPanel());
+        notesTab nt = new notesTab(task);
+        tPane.addTab("Notes", nt.buildPanel());
+        tPane.addTab("Attachments", new JPanel());
+        tPane.addTab("Appearance", new JPanel());
 
         // Add components to the frames panel
         editPanel.add(tPane, BorderLayout.CENTER);
@@ -169,80 +162,6 @@ public class jTaskEdit implements ActionListener {
 
         // Add the Description panel to the tPane
         tPane.addTab("Description", descPanel);
-    }
-
-    public void initDatesTab() {
-        // Panel to add to the tPane storing all these components
-        datesPanel = new JPanel();
-        // LayoutManager helper
-        LayoutManager lm = new LayoutManager(datesPanel);
-
-        // TODO: All the check boxes here need to check if the attribute is set and tick if it is
-        // TODO: All the text boxes where there are no attributes set should be disabled
-
-        // Planned start date section
-        JLabel plannedStartDateLabel = new JLabel("Planned start date");
-        JCheckBox plannedStartDateCheck = new JCheckBox();
-        JTextArea plannedStartDate = new JTextArea(task.getFormattedPlannedStartDate());
-
-        lm.addNext(plannedStartDateLabel);
-        lm.addNext(plannedStartDateCheck);
-        lm.addNext(plannedStartDate);
-
-        // Due date section
-        JLabel dueDateLabel = new JLabel("Due date");
-        JCheckBox dueDateCheck = new JCheckBox();
-        JTextArea dueDate = new JTextArea(task.getFormattedDueDateTime());
-
-        lm.addNextRow(dueDateLabel);
-        lm.addNext(dueDateCheck);
-        lm.addNext(dueDate);
-
-        // Insert separator
-        lm.addSeparator();
-
-        // Actual start date section
-        JLabel actualStartDateLabel = new JLabel("Actual start date");
-        JCheckBox actualStartDateCheck = new JCheckBox();
-        JTextArea actualStartDate = new JTextArea(task.getFormattedActualStartDateTime());
-
-        lm.addNext(actualStartDateLabel);
-        lm.addNext(actualStartDateCheck);
-        lm.addNext(actualStartDate);
-
-        // Completion date section
-        JLabel completionDateLabel = new JLabel("Completion date");
-        JCheckBox completionDateCheck = new JCheckBox();
-        JTextArea completionDate = new JTextArea(task.getFormattedCompletionDateTime());
-
-        lm.addNextRow(completionDateLabel);
-        lm.addNext(completionDateCheck);
-        lm.addNext(completionDate);
-
-        // Insert separator
-        lm.addSeparator();
-
-        // Reminder section
-        JLabel reminderLabel = new JLabel("Reminder");
-        JCheckBox reminderCheck = new JCheckBox();
-        // TODO: FIX ME
-        JTextArea reminderDate = new JTextArea(task.getFormattedActualStartDateTime());
-
-        lm.addNext(reminderLabel);
-        lm.addNext(reminderCheck);
-        lm.addNext(reminderDate);
-
-        // Insert separator
-        lm.addSeparator();
-
-        // Reccurrence section
-        JLabel recurrenceLabel = new JLabel("Recurrence");
-        // TODO: Reccurrence is completly missing
-
-        lm.addNext(recurrenceLabel);
-
-        // Add the Dates panel to the tPane
-        tPane.addTab("Dates", datesPanel);
     }
 
     public void actionPerformed(ActionEvent e) {
