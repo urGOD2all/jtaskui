@@ -37,7 +37,7 @@ public class TaskObj {
     // TODO: I dont like this, I think its naff. I think the better option would be to use a sortable Collection like TreeSet
     //  // TODO (cont.) : I can get that TreeSet Collection from a Vector so maybe this is best served as a Vector object ?
     // This is a Map of all the notes
-    private HashMap<String, TaskObj> notesMap = new HashMap<String, TaskObj>();
+    private HashMap<Integer, TaskObj> notesMap = new HashMap<Integer, TaskObj>();
 
     // Used to store the parent of this task. Will be null if this is the root
     private TaskObj parent;
@@ -532,8 +532,50 @@ public class TaskObj {
     // TODO: Need to handle notes better than this
     public void addNote(TaskObj note) {
         // Add the note to the notes map
-        notesMap.put(note.getID(), note);
+        notesMap.put(notesMap.size()+1, note);
     }
+
+    /**
+     * If there are subnotes (notes with children) in the notesMap then return true, otherwise false.
+     *
+     * @boolean - true if this object contains subnotes, false if not.
+     */
+    public boolean hasSubNote() {
+        if (getSubNoteCount() == 0) return false;
+        return true;
+    }
+
+    /**
+     * Get the child subnotes from the specified index
+     *
+     * @param index - int position of the child to query
+     * @return TaskObj - child/subnote at that location
+     */
+    public TaskObj getSubNoteAt(int index) {
+        return notesMap.get(index);
+    }
+
+    /**
+     * Get the Index of the specified Child/subnote
+     *
+     * @param TaskObj child - this is a child object / subnote to find the index of
+     * @return int - index of the specified subnote
+     */
+    public int getSubNoteIndex(TaskObj note) {
+        for (Map.Entry<Integer, TaskObj> aSubNote : notesMap.entrySet()) {
+            if(aSubNote.getValue() == note) return aSubNote.getKey();
+        }
+        System.out.println("Error: Asked for a subnote position that does not exist!");
+        return 0;
+    }
+
+    /**
+     * Returns the number of subtasks for this task (this level only).
+     */
+    public int getSubNoteCount() {
+        return notesMap.size();
+    }
+
     /**
      * If there are no children (subtasks) in the childMap then return true, otherwise false.
      *
