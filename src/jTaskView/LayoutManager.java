@@ -44,6 +44,10 @@ public class LayoutManager {
         addNext(addComponent, currentCol, currentRow, 1, 1, 0.0, 0.5, GridBagConstraints.FIRST_LINE_START, GridBagConstraints.NONE);
     }
 
+    public void addNextStretch(JComponent addComponent) {
+        addNext(addComponent, currentCol, currentRow, 1, 1, 1.0, 1.0, GridBagConstraints.FIRST_LINE_START, GridBagConstraints.BOTH);
+    }
+
     /**
      * Internal helper for addNext
      */
