@@ -376,7 +376,7 @@ public class TaskObj {
      * @return String - the raw actual start date and time attribute from the datasource.
      */
     public String getActualStartDateTime() {
-        return getAttribute("actualStartDateTime");
+        return getAttribute("actualstartdate");
     }
 
     /**
@@ -599,6 +599,24 @@ public class TaskObj {
     public boolean hasDescription() {
         if (getDescription() == null) return false;
         return true;
+    }
+
+    /**
+     * Returns true if this Task is completed, false otherwise
+     *
+     * @return boolean - if Task is completed returns true, false otherwise
+     */
+    public boolean isComplete() {
+        return attributes.containsKey("completiondate");
+    }
+
+    /**
+     * Returns true if this Task has started, false otherwise
+     *
+     * @return boolean - if Task is complete returns true, false otherwise
+     */
+    public boolean isStarted() {
+        return attributes.containsKey("actualstartdate");
     }
 
     public int getUnsupportedAttributeCount() {
