@@ -47,6 +47,7 @@ public class TaskObj {
 
     // Formatter objects for converting the date time format from TaskCoach stored format and the display format
     private DateTimeFormatter readInDateFormat, dateDisplayFormat;
+    private final String dateDisplayFormatString = "yyyy-MM-dd HH:mm";
 
     /*
      * Constructors
@@ -66,7 +67,7 @@ public class TaskObj {
         // Create a formatter for reading in from the file.
         readInDateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.nnnnnn");
         // Create a formater that for display purposes
-        dateDisplayFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        dateDisplayFormat = DateTimeFormatter.ofPattern(dateDisplayFormatString);
     }
 
     /**
@@ -310,6 +311,11 @@ public class TaskObj {
         }
         catch(NullPointerException npe) {
             // This attribute is absent so return N/A which is what formatted field dates look like when they are absent
+            return "N/A";
+        }
+        catch(DateTimeParseException dtpe) {
+        // TODO: Make errors like this come up either in a console or as an error message
+            System.out.println("Error parsing datetime for " + dateTime + " in " + dateDisplayFormatString + " format");
             return "N/A";
         }
     }
