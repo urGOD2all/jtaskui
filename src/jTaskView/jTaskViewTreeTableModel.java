@@ -59,9 +59,6 @@ public class jTaskViewTreeTableModel extends AbstractTreeTableModel {
         return columnTypes[1];
     }
 
-//TODO: Need a getValueAt(int,int) so that we can tell what the selected row / col is and get the data for it ?
-// There are probably other ways of achieving this, so weight it up....
-
     /**
      * Gets the value from the TaskObj for the specified column.
      *
@@ -89,7 +86,9 @@ public class jTaskViewTreeTableModel extends AbstractTreeTableModel {
         // Call the right method for the right column name
         switch (colName) {
             case "Task Subject":
-                return task.getSubject();
+                // Return the TaskObj here. The output will be taken care of by toString() and this can not be used when sorting tasks by Subject
+                return task;
+//                return task.getSubject();
             case "Description":
                 return task.getDescription();
             case "Creation Date":
@@ -163,15 +162,6 @@ public class jTaskViewTreeTableModel extends AbstractTreeTableModel {
    public int getColumnCount() {
        return columnNames.size();
    }
-
-    /**
-     * Get the number of child Tasks in this object
-     *
-     * @return int - number of Child Tasks
-     */
-    public int getRowCount() {
-        return this.getRoot().getChildCount();
-    }
 
     /**
      * Returns the name of the column appearing in the view at column position index.
