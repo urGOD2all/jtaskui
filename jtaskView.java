@@ -14,6 +14,9 @@ import jtaskview.ui.jTaskEdit;
 
 import javax.swing.SwingUtilities;
 
+import java.awt.Component;
+import javax.swing.table.TableCellRenderer;
+import java.awt.Color;
 import javax.swing.JFrame;
 import java.awt.BorderLayout;
 import javax.swing.JMenuBar;
@@ -33,6 +36,8 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+import javax.swing.table.TableRowSorter;
 
 // TODO: Remove this when the diag code is removed
 import java.util.Map;
@@ -156,22 +161,43 @@ public class jtaskView implements ActionListener {
 
         // Make a new TreeTableModel and pass the root object
         treeTableModel = new jTaskViewTreeTableModel(this.root);
-        // Add the TreeTableModel to the Treetable
-        taskTreeTable = new TreeTable(treeTableModel);
+        // Create a TreeTable using our TreeTableModel and override prepareRenderer to adjust the cell component depending on Task state.
+        taskTreeTable = new TreeTable(treeTableModel) {
+            public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
+                // First, call the TreeTable to prepare the renderer
+                Component c = super.prepareRenderer(renderer, row, column);
+                // Get the node for this row from the model using view indexes incase of sorting
+                TaskObj rowData = (TaskObj) getModel().nodeForRow(convertRowIndexToModel(row));
+
+                // Depending on the state of the task, change the text color
+                if (rowData.isComplete()) c.setForeground(Color.GREEN);
+                else if (rowData.isStarted()) c.setForeground(Color.BLUE);
+                else c.setForeground(Color.GRAY);
+
+                // Return the modified component
+                return c;
+            }
+        };
         // Hide the root node
         taskTreeTable.setRootVisible(false);
         // Make sure all the chidlren have a expansion handles
         taskTreeTable.setShowsRootHandles(true);
+
+        // Set the columns sortable
+        taskTreeTable.setAutoCreateRowSorter(true);
+        // Get the RowSorter and set the custom comparator so we get proper sorting
+        TableRowSorter treeTableRowSorter = (TableRowSorter) taskTreeTable.getRowSorter();
+        treeTableRowSorter.setComparator(0, new TaskObjRowSorter(treeTableModel));
 
         // TODO: Should this be here ?
         taskTreeTable.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent me) {
                 // Detect double click events
                 if (me.getClickCount() == 2) {
-                    // Get the selected row
+                    // Get the selected row in the view
                     int selectedRow = getTaskTable().getSelectedRow();
-                    // get the TaskObj powering that row
-                    TaskObj selectedTask = (TaskObj) getModel().nodeForRow(selectedRow);
+                    // get the TaskObj powering that row by converted the row selected in the view back to the model order
+                    TaskObj selectedTask = (TaskObj) getModel().nodeForRow(taskTreeTable.convertRowIndexToModel(selectedRow));
 
                     // Invoke a thread for the edit frame
                     SwingUtilities.invokeLater(new Runnable() {
