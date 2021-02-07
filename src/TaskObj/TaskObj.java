@@ -619,10 +619,12 @@ public class TaskObj {
     /**
      * Returns true if this Task has started, false otherwise
      *
-     * @return boolean - if Task is complete returns true, false otherwise
+     * @return boolean - if Task is started returns true, false otherwise
      */
     public boolean isStarted() {
-        return attributes.containsKey("actualstartdate");
+        // Check to see if the task is started but not complete, tasks can have a complete and start date
+        if(attributes.containsKey("actualstartdate") && !isComplete()) return true;
+        else return false;
     }
 
     public int getUnsupportedAttributeCount() {
