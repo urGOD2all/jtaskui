@@ -65,38 +65,19 @@ public class TaskObjRowSorter implements Comparator<TaskObj> {
 //        System.out.println("    Task1: " + task1);
 //        System.out.println("    Task2: " + task2);
 
-        // If the parents are the same then these are both children of the same parent
-        if(task1.getParent() == task2.getParent()) { 
-            // TODO: Compare things like:
-            //       is either/both task completed?
-            //       is either/both task started?
-            //       is either/both task not started?
-            //       is either/both tasks overdue?
-            //       Finally simple string compare
-            return task1.toString().compareTo(task2.toString());
-        }
-        // task1 is parent of task2, task1 must come first so less than
-        else if(task1 == task2.getParent()) return -1;
-        // task2 is parent of task1, task2 come first so task1 is greater than
-        else if(task2 == task1.getParent()) return 1;
-
         // Build TreePath objects for both tasks to be compared
-        TreePath p1 = buildTreePath(task1);
-        TreePath p2 = buildTreePath(task2);
+        TreePath path1 = buildTreePath(task1);
+        TreePath path2 = buildTreePath(task2);
         // Get the common ancestor position, if any
-        int i = getCommonPath(p1, p2);
-
-//        System.out.println("task1 and task2 share path " + i + ": " + p1.getPathComponent(i));
-//        System.out.println(p1);
-//        System.out.println(p2);
+        int i = getCommonPath(path1, path2);
 
         // TODO: Probably not best to compare strings here either
         // Compare the next element (i+1) from the common ancestor
-        if(p1.getPathCount() > (i+1) && p2.getPathCount() > (i+1)) return p1.getPathComponent(i+1).toString().compareTo(p2.getPathComponent(i+1).toString());
+        if(path1.getPathCount() > (i+1) && path2.getPathCount() > (i+1)) return path1.getPathComponent(i+1).toString().compareTo(path2.getPathComponent(i+1).toString());
         // p1 is longer so must be a child of p2
-        else if(p1.getPathCount() > (i+1)) return 1;
+        else if(path1.getPathCount() > (i+1)) return 1;
         // p2 is longer so must be a child of p1
-        else if(p2.getPathCount() > (i+1)) return -1;
+        else if(path2.getPathCount() > (i+1)) return -1;
         // This should never happen
         else System.out.println("Cant compare i+1 between task1 " + task1 + " and task 2 " + task2);
 
