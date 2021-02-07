@@ -93,9 +93,14 @@ public class TaskObjRowSorter implements Comparator<TaskObj> {
         // TODO: Probably not best to compare strings here either
         // Compare the next element (i+1) from the common ancestor
         if(p1.getPathCount() > (i+1) && p2.getPathCount() > (i+1)) return p1.getPathComponent(i+1).toString().compareTo(p2.getPathComponent(i+1).toString());
-        else System.out.println("Cant compare i+1");
+        // p1 is longer so must be a child of p2
+        else if(p1.getPathCount() > (i+1)) return 1;
+        // p2 is longer so must be a child of p1
+        else if(p2.getPathCount() > (i+1)) return -1;
+        // This should never happen
+        else System.out.println("Cant compare i+1 between task1 " + task1 + " and task 2 " + task2);
 
-//        System.out.println("** No matches, return equal");
+        System.out.println("** No matches, return equal");
         return 0;
     }   
 }
