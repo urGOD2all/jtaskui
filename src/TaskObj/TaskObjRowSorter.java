@@ -10,6 +10,8 @@ import javax.swing.tree.TreePath;
 public class TaskObjRowSorter implements Comparator<TaskObj> {
     jTaskViewTreeTableModel treeTableModel;
 
+    private Object root;
+
     public TaskObjRowSorter(jTaskViewTreeTableModel treeTableModel) {
         this.treeTableModel = treeTableModel;
     }
@@ -23,7 +25,7 @@ public class TaskObjRowSorter implements Comparator<TaskObj> {
     private TreePath buildTreePath(TaskObj task) {
         TaskObj parent = task.getParent();
         // If the parent is null we are at the top of the tree so return a new TreePath with this element (the root) in it
-        if(parent == null) return new TreePath(task);
+        if(parent == null) { root = task; return new TreePath(task);}
         return buildTreePath(parent).pathByAddingChild(task);
     }
 
@@ -61,27 +63,121 @@ public class TaskObjRowSorter implements Comparator<TaskObj> {
     // TODO: All the positional logic is here, just need to sort the Task state (completed, started etc)
     @Override
     public int compare(TaskObj task1, TaskObj task2) {
-//        System.out.println("Asked to sort:");
-//        System.out.println("    Task1: " + task1);
-//        System.out.println("    Task2: " + task2);
-
         // Build TreePath objects for both tasks to be compared
         TreePath path1 = buildTreePath(task1);
         TreePath path2 = buildTreePath(task2);
         // Get the common ancestor position, if any
         int i = getCommonPath(path1, path2);
+        // Debuging flags to help solve sorting issues
+        boolean debug = false;
+        //System.out.println(path1.getPathComponent(1).toString());
+        //if (path1.getPathCount() >= 3 && path1.getPathComponent(2).toString().compareTo("Some Test String") == 0) debug = true;
+        //if (path2.getPathCount() >= 3 && path2.getPathComponent(2).toString().compareTo("Some Test String") == 0) debug = true;
+        int path1Len = path1.getPathCount();
+        int path2Len = path2.getPathCount();
+        TaskObj path1NextFromCommon;
+        TaskObj path2NextFromCommon;
+        if(path1Len > (i+1)) path1NextFromCommon = (TaskObj) path1.getPathComponent(i+1);
+        else path1NextFromCommon = task1;
+        if(path2Len > (i+1)) path2NextFromCommon = (TaskObj) path2.getPathComponent(i+1);
+        else path2NextFromCommon = task2;
 
-        // TODO: Probably not best to compare strings here either
-        // Compare the next element (i+1) from the common ancestor
-        if(path1.getPathCount() > (i+1) && path2.getPathCount() > (i+1)) return path1.getPathComponent(i+1).toString().compareTo(path2.getPathComponent(i+1).toString());
-        // p1 is longer so must be a child of p2
-        else if(path1.getPathCount() > (i+1)) return 1;
-        // p2 is longer so must be a child of p1
-        else if(path2.getPathCount() > (i+1)) return -1;
-        // This should never happen
-        else System.out.println("Cant compare i+1 between task1 " + task1 + " and task 2 " + task2);
+        if(debug) {
+            System.out.println("----------");
+            System.out.println("Task1: " + task1);
+            System.out.println("Next Common: " + path1NextFromCommon);
+            System.out.println("Path: " + path1);
+            System.out.println("----------");
+            System.out.println("Task2: " + task2);
+            System.out.println("Next Common: " + path2NextFromCommon);
+            System.out.println("Path: " + path2);
+            System.out.println("----------");
+            System.out.println();
+        }
 
-        System.out.println("** No matches, return equal");
+        // Check that both tasks and next common ancestors are the same as tasks
+        if(path1NextFromCommon == task1 && path2NextFromCommon == task2) {
+            if(debug) System.out.println("====== Both common are the same as task");
+
+            // If these tasks are siblings
+            if(task1.getParent() == task2.getParent()) {
+                if(debug) System.out.println("====== parents are the same");
+                // Check if they are both started
+                if(task1.isStarted() && task2.isStarted()) {
+                    if(debug) System.out.println("====== both are started so string match, returning " + path1NextFromCommon.toString().compareTo(path2NextFromCommon.toString()));
+                    return path1NextFromCommon.toString().compareTo(path2NextFromCommon.toString());
+                }
+                // If task1 is started
+                else if(task1.isStarted()) {
+                    if(debug) System.out.println("====== task1 is started, returning -1");
+                    return -1;
+                }
+                // If task2 is started
+                else if(task2.isStarted()) {
+                    if(debug) System.out.println("====== task2 is started, returning 1");
+                    return 1;
+                }
+                // Niether of them are started
+                else {
+                    if(debug) System.out.println("****** task1 and task2 are not started, returning " + path1NextFromCommon.toString().compareTo(path2NextFromCommon.toString()));
+                    return path1NextFromCommon.toString().compareTo(path2NextFromCommon.toString());
+                }
+            }
+            // task1 is the parent of task2
+            else if(task1 == task2.getParent()) {
+                if(debug) System.out.println("^^^^^^^^ task1 is the parent of task2, returning -1");
+                return -1;
+            }
+            // task2 is the parent of task1
+            else if(task2 == task1.getParent()) {
+                if(debug) System.out.println("vvvvvvvv task2 is the parent of task1, returning 1");
+                return 1;
+            }
+            else {
+               //TODO: Does anything cause this ?
+               System.out.println("====== First if " + task1 + " --- " + task2);
+            }
+        }
+        // One or both of the ancestors is not the same as the task
+        else {
+            if(debug) System.out.println("<<<>>>======= One of common are not the same as task");
+
+            // Check that the parent of path1NextFromCommon is the same as path2NextFromCommon, this ensures the children stay with parents
+            if(path1NextFromCommon.getParent() == path2NextFromCommon) {
+                if(debug) System.out.println("<<<>>>======= path2 common is parent of path1 common, returning 1");
+                return 1;
+            }
+            else if(path2NextFromCommon.getParent() == path1NextFromCommon) {
+                if(debug) System.out.println("<<<>>>======= path1 common is parent of path2 common, returning -1");
+                return -1;
+            }
+
+            // Check the next from ancestors are both started
+            if(path1NextFromCommon.isStarted() && path2NextFromCommon.isStarted()) {
+                if(debug) System.out.println("<<<>>>======= both ancestors are started so string match, returning " + path1NextFromCommon.toString().compareTo(path2NextFromCommon.toString()));
+                return path1NextFromCommon.toString().compareTo(path2NextFromCommon.toString());
+            }
+            // Check that the next from ancestor of task1 is started
+            else if(path1NextFromCommon.isStarted()) {
+                if(debug) System.out.println("<<<>>>======= ancestor of task1 is started, returning -1");
+                return -1;
+            }
+            // Check that the next from ancestor of task2 is started
+            else if(path2NextFromCommon.isStarted()) {
+                if(debug) System.out.println("<<<>>>======= ancestor of task1 is started, returning 1");
+                return 1;
+            }
+            // Else probably got here because neither is started
+            else {
+                if(debug) System.out.println("<<<>>>======= fallen to 2nd else, returning " + path1NextFromCommon.toString().compareTo(path2NextFromCommon.toString()));
+                return path1NextFromCommon.toString().compareTo(path2NextFromCommon.toString());
+            }
+        }
+
+        // This means there is missing logic and could result in lost children
+        System.out.println("SHOULD NOT BE HERE");
+
+        if(debug) System.out.println("** No matches, return equal");
         return 0;
     }   
 }
