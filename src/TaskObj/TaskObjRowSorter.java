@@ -102,26 +102,8 @@ public class TaskObjRowSorter implements Comparator<TaskObj> {
             // If these tasks are siblings
             if(task1.getParent() == task2.getParent()) {
                 if(debug) System.out.println("====== parents are the same");
-                // Check if they are both started
-                if(task1.isStarted() && task2.isStarted()) {
-                    if(debug) System.out.println("====== both are started so string match, returning " + path1NextFromCommon.toString().compareTo(path2NextFromCommon.toString()));
-                    return path1NextFromCommon.toString().compareTo(path2NextFromCommon.toString());
-                }
-                // If task1 is started
-                else if(task1.isStarted()) {
-                    if(debug) System.out.println("====== task1 is started, returning -1");
-                    return -1;
-                }
-                // If task2 is started
-                else if(task2.isStarted()) {
-                    if(debug) System.out.println("====== task2 is started, returning 1");
-                    return 1;
-                }
-                // Niether of them are started
-                else {
-                    if(debug) System.out.println("****** task1 and task2 are not started, returning " + path1NextFromCommon.toString().compareTo(path2NextFromCommon.toString()));
-                    return path1NextFromCommon.toString().compareTo(path2NextFromCommon.toString());
-                }
+
+                return path1NextFromCommon.compareTo(path2NextFromCommon);
             }
             // task1 is the parent of task2
             else if(task1 == task2.getParent()) {
@@ -152,26 +134,7 @@ public class TaskObjRowSorter implements Comparator<TaskObj> {
                 return -1;
             }
 
-            // Check the next from ancestors are both started
-            if(path1NextFromCommon.isStarted() && path2NextFromCommon.isStarted()) {
-                if(debug) System.out.println("<<<>>>======= both ancestors are started so string match, returning " + path1NextFromCommon.toString().compareTo(path2NextFromCommon.toString()));
-                return path1NextFromCommon.toString().compareTo(path2NextFromCommon.toString());
-            }
-            // Check that the next from ancestor of task1 is started
-            else if(path1NextFromCommon.isStarted()) {
-                if(debug) System.out.println("<<<>>>======= ancestor of task1 is started, returning -1");
-                return -1;
-            }
-            // Check that the next from ancestor of task2 is started
-            else if(path2NextFromCommon.isStarted()) {
-                if(debug) System.out.println("<<<>>>======= ancestor of task1 is started, returning 1");
-                return 1;
-            }
-            // Else probably got here because neither is started
-            else {
-                if(debug) System.out.println("<<<>>>======= fallen to 2nd else, returning " + path1NextFromCommon.toString().compareTo(path2NextFromCommon.toString()));
-                return path1NextFromCommon.toString().compareTo(path2NextFromCommon.toString());
-            }
+            return path1NextFromCommon.compareTo(path2NextFromCommon);
         }
 
         // This means there is missing logic and could result in lost children

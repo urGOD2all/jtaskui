@@ -13,7 +13,7 @@ import java.time.format.DateTimeParseException;
 
 // TODO: Interesting observation, my test setup has Tasks with IDs that are mostly the same, look into this further
 // TODO: as we now use this for notes as there is much overlap, we should consider perhaps having an enum to tell us what type of object this is ?
-public class TaskObj {
+public class TaskObj implements Comparable<TaskObj> {
     // This is a map of all the attributes that the task has
     private HashMap<String, String> attributes;
 
@@ -639,5 +639,24 @@ public class TaskObj {
     @Override
     public String toString() {
         return this.getSubject();
+    }
+
+    // TODO: Implement overdue (red) and due today (orange)
+    /**
+     * Compares task with this TaskObj. This will compare any two tasks regardless of
+     * location in the Tree. It will only consider the status (for example started, completed, ...)
+     * and not Tree position. Tree position is handled by the Sorter.
+     */
+    public int compareTo(TaskObj task) {
+        // Started checks
+        if(this.isStarted() && task.isStarted()) return this.toString().compareTo(task.toString());
+        else if(this.isStarted()) return -1;
+        else if(task.isStarted()) return 1;
+        // Completed checks
+        else if(this.isComplete() && task.isComplete()) return this.toString().compareTo(task.toString());
+        else if(this.isComplete()) return 1;
+        else if(task.isComplete()) return -1;
+        // Neither of them have a special state, compare Subject
+        else return this.toString().compareTo(task.toString());
     }
 }
