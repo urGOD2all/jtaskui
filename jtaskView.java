@@ -89,6 +89,7 @@ public class jtaskView implements ActionListener {
         this.root = root;
     }
 
+// TODO: This entire method is massive and needs to be broken down into components. This will make this easier to read and maintain
     public void initGUI() {
         // Make the frame and do some general setup
         rootFrame = new JFrame();
@@ -168,7 +169,7 @@ public class jtaskView implements ActionListener {
                 Component c = super.prepareRenderer(renderer, row, column);
                 // Get the node for this row from the model using view indexes incase of sorting
                 TaskObj rowData = (TaskObj) getModel().nodeForRow(convertRowIndexToModel(row));
-
+                // TODO: Need to have overdue items in red and due today in orange
                 // Depending on the state of the task, change the text color
                 if (rowData.isComplete()) c.setForeground(Color.GREEN);
                 else if (rowData.isStarted()) c.setForeground(Color.BLUE);
@@ -187,6 +188,7 @@ public class jtaskView implements ActionListener {
         taskTreeTable.setAutoCreateRowSorter(true);
         // Get the RowSorter and set the custom comparator so we get proper sorting
         TableRowSorter treeTableRowSorter = (TableRowSorter) taskTreeTable.getRowSorter();
+        // TODO: Need to fix the warning when setting this
         treeTableRowSorter.setComparator(0, new TaskObjRowSorter(treeTableModel));
 
         // TODO: Should this be here ?
@@ -213,8 +215,14 @@ public class jtaskView implements ActionListener {
 
         // Add the TreeTable to the scroll pane
         JScrollPane rootScrollpane = new JScrollPane(taskTreeTable);
+        // Create a center panel
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        // Add the ScrollPane with the TreeTable to the center of the center panel
+        centerPanel.add(rootScrollpane, BorderLayout.CENTER);
         // Add the scroll pane to the JFrame
-        rootFrame.add(rootScrollpane, BorderLayout.CENTER);
+        //rootFrame.add(rootScrollpane, BorderLayout.CENTER);
+        // Add the center panel to the JFrame
+        rootFrame.add(centerPanel, BorderLayout.CENTER);
         // TODO: Perhaps take these values from params to the constructor. Then we can save this to the file config and restore the correct size ?
         rootFrame.setSize(800,600);
         rootFrame.setVisible(true);
@@ -323,6 +331,7 @@ public class jtaskView implements ActionListener {
                 getModel().nodesWereInserted();
                 // Update the status bar
                 itemsLabel.setText("Tasks: " + this.root.getAllChildCount() + " total");
+                itemStatsLabel.setText("Status: ? Overdue, ? Late, " + (this.root.getAllChildCount() - this.root.getStatsStartedCount()) + " inactive, " + this.root.getStatsCompletedCount() + " complete");
                 // If this is a merge we need to disable the save option so because it is not known which file to save to.
                 if (fileOpen.getText() == "Merge") {
                     fileSave.setEnabled(false);

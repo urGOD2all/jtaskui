@@ -44,6 +44,8 @@ public class TaskObj implements Comparable<TaskObj> {
 
     // Store the number of all subtasks in the children
     private int subTaskCount;
+    private int startedCount;
+    private int completedCount;
 
     // Formatter objects for converting the date time format from TaskCoach stored format and the display format
     private DateTimeFormatter readInDateFormat, dateDisplayFormat;
@@ -64,6 +66,8 @@ public class TaskObj implements Comparable<TaskObj> {
         setCreationDateTime();
         // Set initial subtasks to 0 (we are new so we have no children yet)
         subTaskCount = 0;
+        startedCount = 0;
+        completedCount = 0;
         // Create a formatter for reading in from the file.
         readInDateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.nnnnnn");
         // Create a formater that for display purposes
@@ -506,6 +510,14 @@ public class TaskObj implements Comparable<TaskObj> {
         return subTaskCount;
     }
 
+    public int getStatsStartedCount() {
+        return startedCount;
+    }
+
+    public int getStatsCompletedCount() {
+        return completedCount;
+    }
+
     /**
      * Returns the parent TaskObj for this TaskObj. Can be null if this is the root of the tree.
      */
@@ -518,9 +530,15 @@ public class TaskObj implements Comparable<TaskObj> {
         // Set the given parent
         child.setParent(this);
         // Tell the parent TaskObj that the number of children has changed
-        if (getParent() != null) getParent().incrementSubChildCount();
+        if (getParent() != null) getParent().updateStats();
         // Else, this object is the root of the tree so needs to know objects have been added at this level
-        else incrementSubChildCount();
+        else updateStats();
+    }
+
+    private void updateStats() {
+        incrementSubChildCount();
+        if(this.isStarted()) incrementStartedCount();
+        if(this.isComplete()) incrementCompletedCount();
     }
 
     /**
@@ -529,10 +547,20 @@ public class TaskObj implements Comparable<TaskObj> {
      * Can also be called by this object if its the root of the tree (indicated by having null parent)
      * to increment the number of subtasks at this level.
      */
-    public void incrementSubChildCount() {
+    private void incrementSubChildCount() {
         subTaskCount = subTaskCount + 1;
         // Tell the parent that the number of children has changed
-        if (parent != null) parent.incrementSubChildCount();
+        if (getParent() != null) getParent().incrementSubChildCount();
+    }
+
+    private void incrementStartedCount() {
+        startedCount = startedCount + 1;
+        if(getParent() != null) getParent().incrementStartedCount();
+    }
+
+    private void incrementCompletedCount() {
+        completedCount = completedCount + 1;
+        if(getParent() != null) getParent().incrementCompletedCount();
     }
 
     // TODO: Need to handle notes better than this
