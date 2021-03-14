@@ -1,7 +1,8 @@
 package jtaskui;
 
-import jtaskui.ui.swing.jTaskView.jtvMenuBar;
 import jtaskui.ui.swing.jTaskView.jtvListener;
+import jtaskui.ui.swing.jTaskView.jtvMenuBar;
+import jtaskui.ui.swing.jTaskView.jtvTaskActionsPanel;
 // Import the TreeTable Model used for jTaskView
 import jtaskui.view.jTaskViewTreeTableModel;
 // Import the TreeTable
@@ -24,7 +25,6 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
-import javax.swing.JButton;
 
 import javax.swing.border.BevelBorder;
 import java.awt.Dimension;
@@ -36,10 +36,6 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import javax.swing.table.TableRowSorter;
-
-import java.awt.Image;
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 
 // TODO: Remove this when the diag code is removed
 import java.util.Map;
@@ -171,22 +167,14 @@ public class jtaskView implements jtvListener {
         JScrollPane rootScrollpane = new JScrollPane(taskTreeTable);
         // Create a center panel
         JPanel centerPanel = new JPanel(new BorderLayout());
-        // Create a button panel
-        JPanel buttonPanel = new JPanel(new BorderLayout());
-        // Add some buttons to the button panel
-        JButton newTask = new JButton();
-// TODO: This works to read icons but the icons must be in the class path. I could also have them raw or in a jar. I need to consider how to start the application, do I have a script that will set the class path or should I put them in where the compiled code is an have some kind of monolith structure. The source structure is a mess anyway and that needs tidying too.
-         try {
-             Image img = ImageIO.read(getClass().getResource("icons/16x16/actions/newtask.png"));
-             newTask.setIcon(new ImageIcon(img));
-         } catch (Exception ex) {
-             System.out.println(ex);
-         }
-        newTask.setPreferredSize(new Dimension(16, 16));
 
-        buttonPanel.add(newTask, BorderLayout.WEST);
-        // Add a button panel to the north of the center panel
-        centerPanel.add(buttonPanel, BorderLayout.NORTH);
+        // Create the Tasks Action Panel (has buttons such as New Task, New Sub Task...)
+        jtvTaskActionsPanel taskActionsPanel = new jtvTaskActionsPanel();
+        // Listen for events from the TaskActionsPanel buttons
+        taskActionsPanel.addListener(this);
+        // Add the panel to the North of the Center panel
+        centerPanel.add(taskActionsPanel.getActionsPanel(), BorderLayout.NORTH);
+
         // Add the ScrollPane with the TreeTable to the center of the center panel
         centerPanel.add(rootScrollpane, BorderLayout.CENTER);
         // Add the scroll pane to the JFrame
@@ -343,16 +331,38 @@ public class jtaskView implements jtvListener {
         System.exit(0);
     }
 
+    /**
+     * This is invoked when the View->Creation Date menu item is clicked
+     */
     public void jtvMenuBarViewCreationDate() {
         toggleColumnVisible("Creation Date",1);
     }
 
+    /**
+     * This is invoked when the View->Modification Date menu item is clicked
+     */
     public void jtvMenuBarViewModificationDate() {
         toggleColumnVisible("Modification Date",2);
     }
 
+    /**
+     * This is invoked when the View->Description menu item is clicked
+     */
     public void jtvMenuBarViewDescription() {
         toggleColumnVisible("Description",3);
+    }
+
+    /**
+     * This is invoked when the New Task button is clicked
+     */
+    public void jtvTaskActionsNewTask() {
+        // TODO: Implement new task
+        System.out.println("New task");
+    }
+
+    public void jtvTaskActionsNewSubTask() {
+        // TODO: Implement new sub task
+        System.out.println("New sub task");
     }
 
     /**

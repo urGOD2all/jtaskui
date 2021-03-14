@@ -5,7 +5,7 @@ package jtaskui.ui.swing.jTaskView;
  */
 public interface jtvListener {
     /*
-     * Menu actions
+     * Menu bar actions
      */
     // File
     void jtvMenuBarFileOpen(String filePath);
@@ -17,4 +17,10 @@ public interface jtvListener {
     void jtvMenuBarViewCreationDate();
     void jtvMenuBarViewModificationDate();
     void jtvMenuBarViewDescription();
+
+    /*
+     * Task Action Panel actions
+     */
+    void jtvTaskActionsNewTask();
+    void jtvTaskActionsNewSubTask();
 }
