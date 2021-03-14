@@ -1,5 +1,7 @@
 package jtaskui;
 
+import jtaskui.ui.swing.jTaskView.jtvMenuBar;
+import jtaskui.ui.swing.jTaskView.jtvListener;
 // Import the TreeTable Model used for jTaskView
 import jtaskui.view.jTaskViewTreeTableModel;
 // Import the TreeTable
@@ -19,9 +21,6 @@ import javax.swing.table.TableCellRenderer;
 import java.awt.Color;
 import javax.swing.JFrame;
 import java.awt.BorderLayout;
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
@@ -30,8 +29,6 @@ import javax.swing.JButton;
 import javax.swing.border.BevelBorder;
 import java.awt.Dimension;
 
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -50,19 +47,13 @@ import java.util.Map;
 /**
  * This code creates the main window and adds/manages the Task Table.
  */
-public class jtaskView {
+public class jtaskView implements jtvListener {
     // File chooser
     private JFileChooser fileChooser;
     // File that was opened
     private String taskFilePath;
     // The main window with the Task Table on it
     private JFrame rootFrame;
-    // The menu bar for the rootFrame
-    private JMenuBar menuBar;
-    // The menus for the rootFrame
-    private JMenu file, view, viewColumns;
-    // The menu items for the rootFrame menus
-    private JMenuItem fileOpen, fileSave, fileSaveAs, fileClose, fileQuit, viewColumnsCreationDate, viewColumnsModificationDate, viewColumnsDescription;
     // A scroll pane for Task Table (ensures we can scroll if the nodes or nodes that are expanded go beyond the bounds)
     private JScrollPane rootScrollpane;
     // Labels used in the status bar
@@ -100,7 +91,11 @@ public class jtaskView {
         rootFrame = new JFrame();
         rootFrame.setLayout(new BorderLayout());
 
-        buildMenuBar();
+        // Make the menu component and listen for changes
+        jtvMenuBar menuBar = new jtvMenuBar();
+        menuBar.addListener(this);
+        // Add the menubar to the frame
+        rootFrame.add(menuBar.getMenuBar(), BorderLayout.NORTH);
 
         // Make a panel for the status bar
         JPanel statusPanel = new JPanel();
@@ -203,58 +198,6 @@ public class jtaskView {
         rootFrame.setVisible(true);
     }
 
-    /**
-     * Build the menu bar and add to the frame
-     */
-    private void buildMenuBar() {
-        // Create the menu bar
-        menuBar = new JMenuBar();
-
-        // The "File" menu bar item
-        file = new JMenu("File");
-        fileOpen = new JMenuItem("Open");
-          fileOpen.addActionListener(e -> menuFileOpen());
-        fileSave = new JMenuItem("Save");
-          fileSave.addActionListener(e -> menuFileSave());
-        fileSave.setEnabled(false);
-        fileSaveAs = new JMenuItem("Save As");
-        fileSaveAs.addActionListener(e -> menuFileSaveAs());
-        fileSaveAs.setEnabled(false);
-        fileClose = new JMenuItem("Close");
-        fileClose.addActionListener(e -> menuFileClose());
-        fileClose.setEnabled(false);
-        fileQuit = new JMenuItem("Quit");
-        fileQuit.addActionListener(e -> menuFileQuit());
-        // Build the File menu
-        file.add(fileOpen);
-        file.add(fileSave);
-        file.add(fileSaveAs);
-        file.add(fileClose);
-        file.add(fileQuit);
-
-        // The "View" menu bar item
-        view = new JMenu("View");
-        viewColumns = new JMenu("Columns");
-        viewColumnsCreationDate = new JMenuItem("Creation Date");
-        viewColumnsCreationDate.addActionListener(e -> toggleColumnVisible("Creation Date",1));
-        viewColumnsModificationDate = new JMenuItem("Modification Date");
-        viewColumnsModificationDate.addActionListener(e -> toggleColumnVisible("Modification Date",2));
-        viewColumnsDescription = new JMenuItem("Description");
-        viewColumnsDescription.addActionListener(e -> toggleColumnVisible("Description",3));
-        // Build the View menu
-        view.add(viewColumns);
-        viewColumns.add(viewColumnsCreationDate);
-        viewColumns.add(viewColumnsModificationDate);
-        viewColumns.add(viewColumnsDescription);
-
-        // Add the menus to the menu bar
-        menuBar.add(file);
-        menuBar.add(view);
-
-        // Add the menu bar to the rootFrame
-        rootFrame.add(menuBar, BorderLayout.NORTH);
-    }
-
     /*
      * Setters
      */
@@ -335,48 +278,36 @@ public class jtaskView {
 
 
     /*
-     * Actions
+     * From the jtvListener interface
      */
-
+// TODO: Make everything package protected instead of public when this class moves package
     /**
-     * This is called when the File->Open menu item is clicked
+     * This is invoked when the File->Open menu item is clicked
      */
-    private void menuFileOpen() {
-        // do file chooser
-        fileChooser = new JFileChooser();
-        fileChooser.setFileFilter(new FileNameExtensionFilter("Task Coach files", "tsk"));
-        int returnVal = fileChooser.showOpenDialog(rootFrame);
-        if(returnVal == JFileChooser.APPROVE_OPTION) {
-            // Store the file path that was opened
-            taskFilePath = fileChooser.getSelectedFile().getAbsoluteFile().toString();
-            // Make an XML reader object
-            TaskObjXMLReader taskXMLReader = new TaskObjXMLReader(taskFilePath, this.root);
-            // Connect to the data source
-            taskXMLReader.connect();
-            // Read the data source (this updates this.root which is passed in the constructor)
-            taskXMLReader.read();
-            // Tell the model that nodes have been inserted into the model
-            getModel().nodesWereInserted();
-            // Update the status bar
-            itemsLabel.setText("Tasks: " + getModel().getRoot().getAllChildCount() + " total");
-            itemStatsLabel.setText("Status: ? Overdue, ? Late, " + (this.root.getAllChildCount() - this.root.getStatsStartedCount()) + " inactive, " + this.root.getStatsCompletedCount() + " complete");
-            // If this is a merge we need to disable the save option so because it is not known which file to save to.
-            if (fileOpen.getText() == "Merge") {
-                fileSave.setEnabled(false);
-            }
-            else {
-                fileSave.setEnabled(true);
-            }
-            // Update the item text to show future opens will merge
-            fileOpen.setText("Merge");
-            fileSaveAs.setEnabled(true);
-            fileClose.setEnabled(true);
-            // TODO: Let see whats what
-            printDiag(this.root, true);
-        }
+    public void jtvMenuBarFileOpen(String filename) {
+        System.out.println(filename);
+        // Store the file path that was opened (also used by save)
+        taskFilePath = filename;
+        // Make an XML reader object
+        TaskObjXMLReader taskXMLReader = new TaskObjXMLReader(taskFilePath, this.root);
+        // Connect to the data source
+        taskXMLReader.connect();
+        // Read the data source (this updates this.root which is passed in the constructor)
+        taskXMLReader.read();
+        // Tell the model that nodes have been inserted into the model
+        getModel().nodesWereInserted();
+        // Update the status bar
+        itemsLabel.setText("Tasks: " + getModel().getRoot().getAllChildCount() + " total");
+        itemStatsLabel.setText("Status: ? Overdue, ? Late, " + (this.root.getAllChildCount() - this.root.getStatsStartedCount()) + " inactive, " + this.root.getStatsCompletedCount() + " complete");
+        // TODO: Let see whats what
+        printDiag(this.root, true);
     }
 
-    private void menuFileSave() {
+    /**
+     * This is invoked when the File->Save menu item is clicked
+     */
+    public void jtvMenuBarFileSave() {
+        // TODO: Check the path in taskFilePath still exists
         TaskObjXMLWriter save = new TaskObjXMLWriter(taskFilePath, getModel().getRoot());
         save.connect();
         if(save.isConnected()) {
@@ -385,36 +316,43 @@ public class jtaskView {
         }
     }
 
-    private void menuFileSaveAs() {
-        // File chooser
-        fileChooser = new JFileChooser();
-        fileChooser.setFileFilter(new FileNameExtensionFilter("Task Coach files", "tsk"));
-        int returnVal = fileChooser.showSaveDialog(rootFrame);
-        if(returnVal == JFileChooser.APPROVE_OPTION) {
-            // Store the file path that was opened
-            taskFilePath = fileChooser.getSelectedFile().getAbsoluteFile().toString();
-            // Fix the extention if the user didnt type it
-            if( ! taskFilePath.endsWith(".tsk")) taskFilePath = taskFilePath + ".tsk";
-            // Save to the specified file
-            TaskObjXMLWriter save = new TaskObjXMLWriter(taskFilePath, getModel().getRoot());
-            save.connect();
-            if(save.isConnected()) {
-                save.write();
-                save.disconnect(); 
-            }
-            // Enable the save option again
-            fileSave.setEnabled(true);
-        }
+    /**
+     * This is invoked when the File->Save As menu item is clicked
+     */
+    public void jtvMenuBarFileSaveAs(String filename) {
+        // Update the file path that is to be saved to
+        taskFilePath = filename;
+        // Fix the extention if the user didnt type it
+        if( ! taskFilePath.endsWith(".tsk")) taskFilePath = taskFilePath + ".tsk";
+        // Save the file
+        jtvMenuBarFileSave();
     }
 
-    private void menuFileClose() {
+    /**
+     * This is invoked when the File->Close menu item is clicked
+     */
+    public void jtvMenuBarFileClose() {
         // TODO: do reset of TreeTable, close file handles etc etc....
-        fileOpen.setText("Open");
     }
 
-    private void menuFileQuit() {
+    /**
+     * This is invoked when the File->Quit menu item is clicked
+     */
+    public void jtvMenuBarFileQuit() {
         // Time to exit
         System.exit(0);
+    }
+
+    public void jtvMenuBarViewCreationDate() {
+        toggleColumnVisible("Creation Date",1);
+    }
+
+    public void jtvMenuBarViewModificationDate() {
+        toggleColumnVisible("Modification Date",2);
+    }
+
+    public void jtvMenuBarViewDescription() {
+        toggleColumnVisible("Description",3);
     }
 
     /**
