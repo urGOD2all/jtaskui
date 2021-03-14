@@ -43,7 +43,7 @@ public class jtvMenuBar {
     /**
      * Adds a listener to the listener list. These listeners will get notified when actions are performed.
      *
-     * @param jtvLister - Class implementing the jtvListener interface
+     * @param jtvListener - Class implementing the jtvListener interface
      */
     public void addListener(jtvListener listener) {
         listeners.add(listener);
