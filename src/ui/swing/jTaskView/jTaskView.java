@@ -1,8 +1,8 @@
-package jtaskui;
+package jtaskui.ui.swing.jTaskView;
 
-import jtaskui.ui.swing.jTaskView.jtvListener;
-import jtaskui.ui.swing.jTaskView.jtvMenuBar;
-import jtaskui.ui.swing.jTaskView.jtvTaskActionsPanel;
+import jtaskui.TaskObj;
+import jtaskui.TaskObjRowSorter;
+
 // Import the TreeTable Model used for jTaskView
 import jtaskui.view.jTaskViewTreeTableModel;
 // Import the TreeTable
@@ -43,7 +43,7 @@ import java.util.Map;
 /**
  * This code creates the main window and adds/manages the Task Table.
  */
-public class jtaskView implements jtvListener {
+public class jTaskView implements jtvListener {
     // File chooser
     private JFileChooser fileChooser;
     // File that was opened
@@ -69,7 +69,7 @@ public class jtaskView implements jtvListener {
     /**
      * Default constructor
      */
-    public jtaskView() {
+    public jTaskView() {
         this.root = new TaskObj("ROOT");
     }
 
@@ -77,7 +77,7 @@ public class jtaskView implements jtvListener {
      * Constructor to take a prepopulated TaskObj.
      */
     @Deprecated
-    public jtaskView(TaskObj root) {
+    public jTaskView(TaskObj root) {
         this.root = root;
     }
 
@@ -268,7 +268,7 @@ public class jtaskView implements jtvListener {
     /*
      * From the jtvListener interface
      */
-// TODO: Make everything package protected instead of public when this class moves package
+
     /**
      * This is invoked when the File->Open menu item is clicked
      */
