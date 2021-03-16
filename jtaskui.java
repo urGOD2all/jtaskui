@@ -1,5 +1,7 @@
 package jtaskui;
 
+import jtaskui.ui.swing.jTaskView.jTaskView;
+
 import javax.swing.SwingUtilities;
 
 /* TODO:
@@ -12,7 +14,7 @@ public class jtaskui {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                jtaskView jtv = new jtaskView();
+                jTaskView jtv = new jTaskView();
                 jtv.initGUI();
             }
         });
