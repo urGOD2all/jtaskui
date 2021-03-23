@@ -1,4 +1,4 @@
-package jTaskUI.jTaskEdit.tabs;
+package jtaskui.ui.swing.jTaskEdit.tabs;
 
 // Import the TreeTable
 import TreeTable.TreeTable;

@@ -1,4 +1,4 @@
-package jtaskview.ui;
+package jtaskui.ui.swing.jTaskEdit;
 
 import jtaskui.TaskObj;
 import jTaskUI.jTaskEdit.tabs.descTab;
