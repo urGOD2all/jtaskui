@@ -1,9 +1,9 @@
 package jtaskui.ui.swing.jTaskEdit;
 
 import jtaskui.TaskObj;
-import jTaskUI.jTaskEdit.tabs.descTab;
-import jTaskUI.jTaskEdit.tabs.datesTab;
-import jTaskUI.jTaskEdit.tabs.notesTab;
+import jtaskui.ui.swing.jTaskEdit.tabs.descTab;
+import jtaskui.ui.swing.jTaskEdit.tabs.datesTab;
+import jtaskui.ui.swing.jTaskEdit.tabs.notesTab;
 
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;

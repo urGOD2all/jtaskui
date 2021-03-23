@@ -13,7 +13,7 @@ import jtaskui.Input.*;
 // Import the Output classes
 import jtaskui.Output.*;
 
-import jtaskview.ui.jTaskEdit;
+import jtaskui.ui.swing.jTaskEdit.jTaskEdit;
 
 import javax.swing.SwingUtilities;
 
