@@ -142,7 +142,7 @@ public class jTaskViewTreeTableModel extends AbstractTreeTableModel {
         // Cast to a TaskObj
         TaskObj task = (TaskObj) parent;
         // Return the child at index+1 (children in TaskObj start at 1 not 0)
-        return task.getChildAt(index+1);
+        return task.getChildAt(index);
     }
 
     /**

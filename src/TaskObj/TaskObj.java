@@ -1,5 +1,7 @@
 package jtaskui;
 
+import TreeTable.TreeTableNode;
+
 import java.util.HashMap;
 
 // TODO: This can be removed when I'm done looking at unsupported items in notes in this class
@@ -13,7 +15,7 @@ import java.time.format.DateTimeParseException;
 
 // TODO: Interesting observation, my test setup has Tasks with IDs that are mostly the same, look into this further
 // TODO: as we now use this for notes as there is much overlap, we should consider perhaps having an enum to tell us what type of object this is ?
-public class TaskObj implements Comparable<TaskObj> {
+public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
     // This is a map of all the attributes that the task has
     private HashMap<String, String> attributes;
 
@@ -500,7 +502,7 @@ public class TaskObj implements Comparable<TaskObj> {
      * @return TaskObj - child/subtask at that location
      */
     public TaskObj getChildAt(int index) {
-        return childMap.get(index);
+        return childMap.get(index+1);
     }
 
     /**
@@ -586,7 +588,7 @@ public class TaskObj implements Comparable<TaskObj> {
      * @return TaskObj - child/subnote at that location
      */
     public TaskObj getSubNoteAt(int index) {
-        return notesMap.get(index);
+        return notesMap.get(index+1);
     }
 
     /**
