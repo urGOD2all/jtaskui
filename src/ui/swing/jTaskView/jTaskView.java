@@ -356,13 +356,32 @@ public class jTaskView implements jtvListener {
      * This is invoked when the New Task button is clicked
      */
     public void jtvTaskActionsNewTask() {
-        // TODO: Implement new task
-        System.out.println("New task");
+        TaskObj newTask = new TaskObj("New Task");
+        getModel().getRoot().addChild(newTask);
+        int[] newIndexs = new int[1];
+        newIndexs[0] = getModel().getRoot().getChildCount()-1;
+        // Inform the TreeTable nodes have been inserted
+        getModel().nodesWereInserted(getModel().getRoot(), newIndexs);
+        // Launch a new editor window
+        jTaskEdit jte = new jTaskEdit(newTask);
+        jte.initGUI();
     }
 
+    /**
+     * This is invoked when the New Sub Task button is clicked
+     */
     public void jtvTaskActionsNewSubTask() {
-        // TODO: Implement new sub task
-        System.out.println("New sub task");
+        int selectedRow = getTaskTable().getSelectedRow();
+        TaskObj selectedTask = (TaskObj) getModel().nodeForRow(taskTreeTable.convertRowIndexToModel(selectedRow));
+        TaskObj newTask = new TaskObj("New Sub Task");
+        selectedTask.addChild(newTask);
+        int[] newIndexs = new int[1];
+        newIndexs[0] = selectedTask.getChildCount()-1;
+        // Inform the TreeTable nodes have been inserted
+        getModel().nodesWereInserted(selectedTask, newIndexs);
+        // Launch a new editor window
+        jTaskEdit jte = new jTaskEdit(newTask);
+        jte.initGUI();
     }
 
     /**
