@@ -55,6 +55,7 @@ public class notesTabTreeTableModel extends AbstractTreeTableModel {
      *
      * @Return Object - Data for the column specified from the TaskObj
      */
+// TODO: Check if need a column converstion here
     @Override
     public Object getValueAt(Object node, int columnIndex) {
         return this.getValueForColumn((TaskObj) node, columnIndex);
@@ -133,8 +134,8 @@ public class notesTabTreeTableModel extends AbstractTreeTableModel {
     public Object getChild(Object parent, int index) {
         // Cast to a TaskObj
         TaskObj task = (TaskObj) parent;
-        // Return the child at index+1 (children in TaskObj start at 1 not 0)
-        return task.getSubNoteAt(index+1);
+        // Return the child at index
+        return task.getSubNoteAt(index);
     }
 
     /**

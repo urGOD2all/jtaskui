@@ -394,7 +394,6 @@ public class jTaskView implements jtvListener {
         int childCount=0;
 
         while (i<tasks.getChildCount()) {
-            i = i + 1;
             // Call ourself so we can have a deep look
             childCount+=printDiag(tasks.getChildAt(i), false);
 
@@ -402,6 +401,7 @@ public class jTaskView implements jtvListener {
             for(Map.Entry<String, String> unsupItem : tasks.getChildAt(i).getUnsupportedAttributes().entrySet()) {
                 System.out.println("Unsupported items for ID: " + tasks.getChildAt(i).getID() + " - " + unsupItem.getKey() + " = " + unsupItem.getValue());
             }
+            i = i + 1;
         }
 
         if(isRoot == true) {
