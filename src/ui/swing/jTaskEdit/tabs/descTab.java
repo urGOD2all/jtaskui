@@ -2,6 +2,9 @@ package jtaskui.ui.swing.jTaskEdit.tabs;
 
 import jtaskui.TaskObj;
 
+import java.awt.event.FocusListener;
+import java.awt.event.FocusEvent;
+
 import java.awt.BorderLayout;
 
 import javax.swing.JPanel;
@@ -10,8 +13,12 @@ import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 
-public class descTab {
+public class descTab implements FocusListener {
     private TaskObj task;
+
+    private JTextArea subject;
+    private JTextArea description;
+    private JSpinner priority;
 
     public descTab(TaskObj task) {
         this.task = task;
@@ -36,15 +43,20 @@ public class descTab {
         // Populate the Description panel labels and data
         // Subject
         JLabel subjectLabel = new JLabel("Subject");
-        JTextArea subject = new JTextArea(task.getSubject());
+        subject = new JTextArea(task.getSubject());
+        subject.addFocusListener(this);
+
         // Description
         JLabel descriptionLabel = new JLabel("Description");
-        JTextArea description = new JTextArea(task.getDescription());
+        description = new JTextArea(task.getDescription());
         description.setLineWrap(true);
+        description.addFocusListener(this);
         JScrollPane descScroll = new JScrollPane(description);
+
         // Priority
+        // TODO: Implement update for the Task when value is changed
         JLabel priorityLabel = new JLabel("Priority");
-        JSpinner priority = new JSpinner(new javax.swing.SpinnerNumberModel());
+        priority = new JSpinner(new javax.swing.SpinnerNumberModel());
         priority.setEditor(new javax.swing.JSpinner.NumberEditor(priority, "0"));
         if(task.getPriority() != null) {
             try {
@@ -86,5 +98,20 @@ public class descTab {
         descPanel.add(southPanel, BorderLayout.SOUTH);
 
         return descPanel;
+    }
+
+    public void focusGained(FocusEvent e) {
+        // Do nothing...
+    }
+
+    /**
+     * When focus is lost on a field, update the Task
+     */
+    public void focusLost(FocusEvent e) {
+        Object source = e.getSource();
+        if(source == subject)
+            task.setSubject(subject.getText());
+        else if(source == description)
+            task.setDescription(description.getText());
     }
 }
