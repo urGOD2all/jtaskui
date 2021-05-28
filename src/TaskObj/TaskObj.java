@@ -53,6 +53,28 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
     private DateTimeFormatter readInDateFormat, dateDisplayFormat;
     private final String dateDisplayFormatString = "yyyy-MM-dd HH:mm";
 
+    // Fields for Date and Time formats
+    private static final String HIGH_PRECISION_FORMAT  = "yyyy-MM-dd HH:mm:ss.nnnnnn";
+    private static final String LOW_PRECISION_FORMAT   = "yyyy-MM-dd HH:mm:ss";
+    public static final String DUE_DATE_FORMAT         = LOW_PRECISION_FORMAT;
+    public static final String REMINDER_DATE_FORMAT    = LOW_PRECISION_FORMAT;
+    public static final String PLANNED_DATE_FORMAT     = LOW_PRECISION_FORMAT;
+    public static final String CREATION_DATE_FORMAT    = HIGH_PRECISION_FORMAT;
+    public static final String MODIFICTION_DATE_FORMAT = HIGH_PRECISION_FORMAT;
+    public static final String COMPLETION_DATE_FORMAT  = HIGH_PRECISION_FORMAT;
+    public static final String ACTUAL_DATE_FORMAT      = HIGH_PRECISION_FORMAT;
+
+    // Fields for Date and Time Formatters
+    private static final DateTimeFormatter HIGH_PRECISION_FORMATTER  = DateTimeFormatter.ofPattern(HIGH_PRECISION_FORMAT);
+    private static final DateTimeFormatter LOW_PRECISION_FORMATTER   = DateTimeFormatter.ofPattern(LOW_PRECISION_FORMAT);
+    public static final DateTimeFormatter DUE_DATE_FORMATTER         = LOW_PRECISION_FORMATTER;
+    public static final DateTimeFormatter PLANNED_DATE_FORMATTER     = LOW_PRECISION_FORMATTER;
+    public static final DateTimeFormatter REMINDER_DATE_FORMATTER    = LOW_PRECISION_FORMATTER;
+    public static final DateTimeFormatter CREATION_DATE_FORMATTER    = HIGH_PRECISION_FORMATTER;
+    public static final DateTimeFormatter MODIFICTION_DATE_FORMATTER = HIGH_PRECISION_FORMATTER;
+    public static final DateTimeFormatter COMPLETION_DATE_FORMATTER  = HIGH_PRECISION_FORMATTER;
+    public static final DateTimeFormatter ACTUAL_DATE_FORMATTER      = HIGH_PRECISION_FORMATTER;
+
     /*
      * Constructors
      */
@@ -147,7 +169,6 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         }
     }
 
-    // TODO: This is private for now until I find out what this does
     /**
      * Set the status attribute of this Task.
      *
@@ -164,31 +185,67 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         setCreationDateTime("now");
     }
 
-    public void setCreationDateTime(String value) {
+    private void setCreationDateTime(String value) {
         attributes.put("creationDateTime", value);
     }
 
-    public void setModificationDateTime(String value) {
+    private void setModificationDateTime(String value) {
         attributes.put("modificationDateTime", value);
     }
 
-    public void setDueDateTime(String value) {
+    private void setDueDateTime(String value) {
         attributes.put("duedate", value);
     }
 
-    public void setPlannedStartDateTime(String value) {
+    public void setDueDateTime(LocalDateTime value) {
+        try {
+            setDueDateTime(value.format(TaskObj.DUE_DATE_FORMATTER));
+        }
+        catch(Exception e) {
+            removeDueDateTime();
+        }
+    }
+
+    private void setPlannedStartDateTime(String value) {
         attributes.put("plannedstartdate", value);
     }
 
-    public void setActualStartDateTime(String value) {
+    public void setPlannedStartDateTime(LocalDateTime value) {
+        try {
+            setPlannedStartDateTime(value.format(TaskObj.PLANNED_DATE_FORMATTER));
+        }
+        catch(Exception e) {
+            removePlannedStartDateTime();
+        }
+    }
+
+    private void setActualStartDateTime(String value) {
         attributes.put("actualstartdate", value);
     }
 
-    public void setCompletionDateTime(String value) {
+    public void setActualStartDateTime(LocalDateTime value) {
+        try {
+            setActualStartDateTime(value.format(TaskObj.ACTUAL_DATE_FORMATTER));
+        }
+        catch(Exception e) {
+            removeActualStartDateTime();
+        }
+    }
+
+    private void setCompletionDateTime(String value) {
         attributes.put("completiondate", value);
     }
 
-    public void setPercentageComplete(String value) {
+    public void setCompletionDateTime(LocalDateTime value) {
+        try {
+            setCompletionDateTime(value.format(TaskObj.COMPLETION_DATE_FORMATTER));
+        }
+        catch(Exception e) {
+            removeCompletionDateTime();
+        }
+    }
+
+    private void setPercentageComplete(String value) {
         attributes.put("percentageComplete", value);
     }
 
@@ -196,7 +253,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         attributes.put("subject", value);
     }
 
-    public void setPriority(String value) {
+    private void setPriority(String value) {
         attributes.put("priority", value);
     }
 
@@ -215,12 +272,12 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
 
     // TODO: This may need to accept something else depending on what we decide to the TODO in the global where the variable is declared
     // TODO: Given the above, this may need to be changed from a "set" to an "add" method
-    public void setExpandedContexts(String value) {
+    private void setExpandedContexts(String value) {
         this.expandedContexts = value;
         attributes.put("expandedContexts", value);
     }
 
-    public void setBGColor(String value) {
+    private void setBGColor(String value) {
         attributes.put("bgColor", value);
     }
 
@@ -231,6 +288,25 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
      */
     public void setParent(TaskObj parent) {
         this.parent = parent;
+    }
+
+    /**
+     * Removes Planned Start Date attribute from this task
+     */
+    private void removePlannedStartDateTime() {
+        attributes.remove("plannedstartdate");
+    }
+
+    private void removeDueDateTime() {
+        attributes.remove("duedate");
+    }
+
+    private void removeActualStartDateTime() {
+        attributes.remove("actualstartdate");
+    }
+
+    private void removeCompletionDateTime() {
+        attributes.remove("completiondate");
     }
 
     /*
@@ -295,6 +371,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
      */
     private LocalDateTime parseDateTime(String dateTime, DateTimeFormatter inFormat) {
         try {
+            if(dateTime == null) return LocalDateTime.now();
             return LocalDateTime.parse(dateTime, inFormat);
         }
         catch (DateTimeParseException e) {
@@ -303,6 +380,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         }
     }
 
+    // TODO: Remove this method and favour LocalDateTime format
     /**
      * Helper to handle parsing dates and times to String output format
      *
@@ -326,15 +404,11 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         }
     }
 
-    /**
-     * Returns a String representation of the creationDateTime attribute. This is the raw value from the datasource.
-     *
-     * @return String - the raw creation date and time attribute from the datasource
+    /*
+     * Internal getters for raw Dates and Times
      */
-    public String getCreationDateTime() {
-        return getAttribute("creationDateTime");
-    }
 
+    // TODO: Remove this method in favour of the LocalDateTimeVersions
     /**
      * Returns a String representation of the creationDateTime attribute in the display format.
      *
@@ -344,6 +418,27 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         return getFormattedDateTime(getCreationDateTime());
     }
 
+    // TODO: Remove this method in favour of the LocalDateTimeVersions
+    /**
+     * Returns a String representation of the modificationDateTime attribute in the display format.
+     *
+     * @return String - Formatted Date and Time
+     */
+    public String getFormattedModificationDateTime() {
+        return getFormattedDateTime(getModificationDateTime());
+    }
+
+    // TODO: Untangle this method from the rest of the code, make it private
+    /**
+     * Returns a String representation of the creationDateTime attribute. This is the raw value from the datasource.
+     *
+     * @return String - the raw creation date and time attribute from the datasource
+     */
+    public String getCreationDateTime() {
+        return getAttribute("creationDateTime");
+    }
+
+    // TODO: Untangle this method from the rest of the code, make it private
     /**
      * Returns a String representation of the modificationDateTime attribute. This is the raw value from the datasource.
      *
@@ -354,32 +449,12 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
     }
 
     /**
-     * Returns a String representation of the modificationDateTime attribute in the display format.
-     *
-     * @return String - Formatted Date and Time
-     */
-    public String getFormattedModificationDateTime() {
-        return getFormattedDateTime(getModificationDateTime());
-    }
-
-    /**
      * Returns a String represenation of the duedate attribute. This is the raw value from the datasource.
      *
      * @return String - the raw due date and time attribute from the datasource.
      */
-    public String getDueDateTime() {
+    private String getDueDateTime() {
         return getAttribute("duedate");
-    }
-
-    /**
-     * Returns a String representation of the duedate attribute in the display format.
-     * At the moment the stored format and display format is the same we here we do no formatting other than existance checking.
-     *
-     * @return String - Formatted Date and Time
-     */
-    public String getFormattedDueDateTime() {
-        if (hasAttribute("duedate")) return getAttribute("duedate");
-        else return "N/A";
     }
 
     /**
@@ -387,17 +462,8 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
      *
      * @return String - the raw actual start date and time attribute from the datasource.
      */
-    public String getActualStartDateTime() {
+    private String getActualStartDateTime() {
         return getAttribute("actualstartdate");
-    }
-
-    /**
-     * Returns a String representation of the actualStartDateTime attribute in the display format.
-     *
-     * @return String - Formatted Date and Time
-     */
-    public String getFormattedActualStartDateTime() {
-        return getFormattedDateTime(getActualStartDateTime());
     }
 
     /**
@@ -405,17 +471,8 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
      *
      * @return String - the raw planned start date and time attribute from the datasource.
      */
-    public String getPlannedStartDateTime() {
+    private String getPlannedStartDateTime() {
         return getAttribute("plannedstartdate");
-    }
-
-    /**
-     * Returns a String representation of the plannedstartdate attribute in display format.
-     *
-     * @return String - Formatted Date and Time
-     */
-    public String getFormattedPlannedStartDate() {
-        return getFormattedDateTime(getPlannedStartDateTime());
     }
 
     /**
@@ -423,17 +480,48 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
      *
      * @return String - the raw completion date and time attribute from the datasource.
      */
-    public String getCompletionDateTime() {
+    private String getCompletionDateTime() {
         return getAttribute("completiondate");
     }
 
-    /**
-     * Returns a String represenation of the completiondate attribute in the display format.
-     *
-     * @return String - Formatted Date and Time
+    /*
+     * Public LocalDateTime formatted date/time getters methods
      */
-    public String getFormattedCompletionDateTime() {
-        return getFormattedDateTime(getCompletionDateTime());
+
+    /**
+     * Returns a correctly formatted Due Date in a LocalDateTime object
+     *
+     * @return LocalDateTime - Task due date
+     */
+    public LocalDateTime getDueDate() {
+        return parseDateTime(getDueDateTime(), TaskObj.DUE_DATE_FORMATTER);
+    }
+
+    /**
+     * Returns a correctly formatted Completion date in a LocalDateTime object
+     *
+     * @return LocalDateTime - Task completion date
+     */
+    public LocalDateTime getCompletionLocalDateTime() {
+        return parseDateTime(getCompletionDateTime(), COMPLETION_DATE_FORMATTER);
+    }
+
+    /**
+     * Returns a correctly formatted Planned Start date in a LocalDateTime object
+     *
+     * @return LocalDateTime - Task due date
+     */
+    public LocalDateTime getPlannedStartLocalDateTime() {
+        return parseDateTime(getPlannedStartDateTime(), TaskObj.PLANNED_DATE_FORMATTER);
+    }
+
+    /**
+     * Returns a correctly formatted Actual Start date in a LocalDateTime object
+     *
+     * @return LocalDateTime - Task due date
+     */
+    public LocalDateTime getActualStartLocalDateTime() {
+        return parseDateTime(getActualStartDateTime(), TaskObj.ACTUAL_DATE_FORMATTER);
     }
 
     /**
@@ -637,13 +725,29 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         return true;
     }
 
+    public boolean hasPlannedStartDate() {
+        if(hasAttribute("plannedstartdate")) return true;
+        else return false;
+    }
+
+    public boolean hasDueDate() {
+        if(hasAttribute("duedate")) return true;
+        else return false;
+    }
+
+    public boolean hasActualStartDate() {
+        if(hasAttribute("actualstartdate")) return true;
+        else return false;
+    }
+
     /**
      * Returns true if this Task is completed, false otherwise
      *
      * @return boolean - if Task is completed returns true, false otherwise
      */
     public boolean isComplete() {
-        return attributes.containsKey("completiondate");
+        //return attributes.containsKey("completiondate");
+        return hasAttribute("completiondate");
     }
 
     /**
@@ -653,7 +757,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
      */
     public boolean isStarted() {
         // Check to see if the task is started but not complete, tasks can have a complete and start date
-        if(attributes.containsKey("actualstartdate") && !isComplete()) return true;
+        if(hasActualStartDate() && !isComplete()) return true;
         else return false;
     }
 
