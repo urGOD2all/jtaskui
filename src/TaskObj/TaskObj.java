@@ -54,7 +54,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
     private final String dateDisplayFormatString = "yyyy-MM-dd HH:mm";
 
     // Fields for Date and Time formats
-    private static final String HIGH_PRECISION_FORMAT  = "yyyy-MM-dd HH:mm:ss.nnnnnn";
+    private static final String HIGH_PRECISION_FORMAT  = "yyyy-MM-dd HH:mm:ss.SSSSSS";
     private static final String LOW_PRECISION_FORMAT   = "yyyy-MM-dd HH:mm:ss";
     public static final String DUE_DATE_FORMAT         = LOW_PRECISION_FORMAT;
     public static final String REMINDER_DATE_FORMAT    = LOW_PRECISION_FORMAT;
@@ -87,7 +87,8 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         attributes = new HashMap<String, String>();
         // Initialise the unsupported attributes HashMap
         unsupportedItems = new HashMap<String, String>();
-        setCreationDateTime();
+        // Set the creation date and time of this Task
+        setCreationDateTime(LocalDateTime.now());
         // Set initial subtasks to 0 (we are new so we have no children yet)
         subTaskCount = 0;
         startedCount = 0;
@@ -178,13 +179,25 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         attributes.put("status", value);
     }
 
-    /*
-     * This is only used within the class when a new task is created.
+    /**
+     * Sets the creation date and time of this Task
+     *
+     * @param LocalDateTime - Time and date to set, will be parsed into the correct format
      */
-    private void setCreationDateTime() {
-        setCreationDateTime("now");
+    private void setCreationDateTime(LocalDateTime value) {
+        try {
+            setCreationDateTime(value.format(TaskObj.CREATION_DATE_FORMATTER));
+        }
+        catch(Exception e) {
+            System.out.println("ERROR: Cannot set creation date/time from " + value + " for " + getSubject());
+        }
     }
 
+    /**
+     * Sets the creation date and time of this Task
+     *
+     * @param String - Time and date to set, this is not parsed and should only be used when reading stored values
+     */
     private void setCreationDateTime(String value) {
         attributes.put("creationDateTime", value);
     }
