@@ -206,6 +206,14 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         attributes.put("modificationDateTime", value);
     }
 
+    /**
+     * Updates the modification time
+     */
+    // TODO; I would like this to be managed by this object, for now, the UI will have to call it
+    public void updateModificationDateTime() {
+        setModificationDateTime(LocalDateTime.now().format(TaskObj.MODIFICTION_DATE_FORMATTER));
+    }
+
     private void setDueDateTime(String value) {
         attributes.put("duedate", value);
     }
