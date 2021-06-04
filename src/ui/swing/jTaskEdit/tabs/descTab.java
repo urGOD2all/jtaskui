@@ -19,6 +19,7 @@ public class descTab implements FocusListener {
     private JTextArea subject;
     private JTextArea description;
     private JSpinner priority;
+    private JLabel modificationDate;
 
     public descTab(TaskObj task) {
         this.task = task;
@@ -72,7 +73,7 @@ public class descTab implements FocusListener {
         JLabel creationDate = new JLabel(task.getFormattedCreationDateTime());
         // Modification date
         JLabel modificationDateLabel = new JLabel("Modification Date");
-        JLabel modificationDate = new JLabel(task.getFormattedModificationDateTime());
+        modificationDate = new JLabel(task.getFormattedModificationDateTime());
 
         // Add the labels and the data to the correct locations
         westPanel.add(subjectLabel, BorderLayout.NORTH);
@@ -109,9 +110,14 @@ public class descTab implements FocusListener {
      */
     public void focusLost(FocusEvent e) {
         Object source = e.getSource();
-        if(source == subject)
+        if(source == subject && !task.getSubject().equals(subject.getText())) {
             task.setSubject(subject.getText());
-        else if(source == description)
+            task.updateModificationDateTime();
+        }
+        else if(source == description && !description.getText().equals(task.getDescription())) {
             task.setDescription(description.getText());
+            task.updateModificationDateTime();
+        }
+        modificationDate.setText(task.getFormattedModificationDateTime());
     }
 }

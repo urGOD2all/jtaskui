@@ -134,6 +134,7 @@ public class datesTab {
         // If the check box is selected, set the date/time on this TaskObj - If its not selected, send a null to unset it
         if(plannedStartDateCheck.isSelected()) task.setPlannedStartDateTime(plannedStartDate.getDateTimePermissive());
         else task.setPlannedStartDateTime(null);
+        task.updateModificationDateTime();
     }
 
     /**
@@ -147,6 +148,7 @@ public class datesTab {
         // If the check box is selected, set the date/time on this TaskObj - If its not selected, send a null to unset it
         if(dueDateCheck.isSelected()) task.setDueDateTime(dueDate.getDateTimePermissive());
         else task.setDueDateTime(null);
+        task.updateModificationDateTime();
     }
 
     /**
@@ -160,6 +162,7 @@ public class datesTab {
         // If the check box is selected, set the date/time on this TaskObj - If its not selected, send a null to unset it
         if(actualStartDateCheck.isSelected()) task.setActualStartDateTime(actualStartDate.getDateTimePermissive());
         else task.setActualStartDateTime(null);
+        task.updateModificationDateTime();
     }
 
     /**
@@ -173,12 +176,14 @@ public class datesTab {
         // If the check box is selected, set the date/time on this TaskObj - If its not selected, send a null to unset it
         if(completionDateCheck.isSelected()) task.setCompletionDateTime(completionDate.getDateTimePermissive());
         else task.setCompletionDateTime(null);
+        task.updateModificationDateTime();
     }
 
     // TODO: Implement this
     private void reminderChanged() {
         System.out.println("Reminder STUB");
 //        reminderDate.setEnabled(reminderCheck.isSelected());
+        //task.updateModificationDateTime();
     }
 
     /**

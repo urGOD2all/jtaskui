@@ -110,6 +110,8 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         this();
         setID(UUID.randomUUID().toString());
         setSubject(subject);
+        // Initialise an empty description
+        setDescription("");
     }
 
     /*
