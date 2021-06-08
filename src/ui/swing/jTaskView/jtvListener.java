@@ -23,4 +23,6 @@ public interface jtvListener {
      */
     void jtvTaskActionsNewTask();
     void jtvTaskActionsNewSubTask();
+
+    void jtvTaskActionsDeleteTask();
 }

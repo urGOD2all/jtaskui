@@ -146,16 +146,11 @@ public class jTaskView implements jtvListener {
             public void mouseClicked(MouseEvent me) {
                 // Detect double click events
                 if (me.getClickCount() == 2) {
-                    // Get the selected row in the view
-                    int selectedRow = getTaskTable().getSelectedRow();
-                    // get the TaskObj powering that row by converted the row selected in the view back to the model order
-                    TaskObj selectedTask = (TaskObj) getModel().nodeForRow(taskTreeTable.convertRowIndexToModel(selectedRow));
-
                     // Invoke a thread for the edit frame
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            jTaskEdit jte = new jTaskEdit(selectedTask);
+                            jTaskEdit jte = new jTaskEdit(getSelectedTask());
                             jte.initGUI();
                         }
                     });
@@ -368,11 +363,17 @@ public class jTaskView implements jtvListener {
     }
 
     /**
+     * This is invoked when the Delete Task button is clicked
+     */
+    public void jtvTaskActionsDeleteTask() {
+        getModel().removeNodeFromParent(getSelectedTask());
+    }
+
+    /**
      * This is invoked when the New Sub Task button is clicked
      */
     public void jtvTaskActionsNewSubTask() {
-        int selectedRow = getTaskTable().getSelectedRow();
-        TaskObj selectedTask = (TaskObj) getModel().nodeForRow(taskTreeTable.convertRowIndexToModel(selectedRow));
+        TaskObj selectedTask = getSelectedTask();
         TaskObj newTask = new TaskObj("New Sub Task");
         selectedTask.addChild(newTask);
         int[] newIndexs = new int[1];
@@ -382,6 +383,14 @@ public class jTaskView implements jtvListener {
         // Launch a new editor window
         jTaskEdit jte = new jTaskEdit(newTask);
         jte.initGUI();
+    }
+
+    private int getSelectedRow() {
+        return getTaskTable().getSelectedRow();
+    }
+
+    private TaskObj getSelectedTask() {
+        return (TaskObj) getModel().nodeForRow(taskTreeTable.convertRowIndexToModel(getSelectedRow()));
     }
 
     /**

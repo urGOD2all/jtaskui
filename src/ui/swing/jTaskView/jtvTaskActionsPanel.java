@@ -64,5 +64,7 @@ public class jtvTaskActionsPanel {
         createButton(getIcon("icons/16x16/actions/newtask.png")).addActionListener(e -> { for (jtvListener aListener : listeners) aListener.jtvTaskActionsNewTask(); });
         // New sub task
         createButton(getIcon("icons/16x16/actions/new_sub.png")).addActionListener(e -> { for (jtvListener aListener : listeners) aListener.jtvTaskActionsNewSubTask(); });
+        // TODO: Insert seperator
+        createButton(getIcon("icons/16x16/actions/editdelete.png")).addActionListener(e -> { for (jtvListener aListener : listeners) aListener.jtvTaskActionsDeleteTask(); });
     }
 }
