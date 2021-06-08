@@ -3,6 +3,7 @@ package jtaskui;
 import TreeTable.TreeTableNode;
 
 import java.util.HashMap;
+import java.util.ArrayList;
 
 // TODO: This can be removed when I'm done looking at unsupported items in notes in this class
 import java.util.Map;
@@ -31,10 +32,8 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
     // This is a Map of all attributes that are unsupported by this code. Ideally this should have no items in it!
     private HashMap<String, String> unsupportedItems;
 
-    // TODO: I dont like this, I think its naff. I think the better option would be to use a sortable Collection like TreeSet
-    //  // TODO (cont.) : I can get that TreeSet Collection from a Vector so maybe this is best served as a Vector object ?
-    // This is a Map of all the child tasks
-    private HashMap<Integer, TaskObj> childMap = new HashMap<Integer, TaskObj>();
+    // This is a List of all the child tasks
+    private ArrayList<TaskObj> childList = new ArrayList<TaskObj>();
 
     // TODO: I dont like this, I think its naff. I think the better option would be to use a sortable Collection like TreeSet
     //  // TODO (cont.) : I can get that TreeSet Collection from a Vector so maybe this is best served as a Vector object ?
@@ -332,6 +331,15 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         attributes.remove("completiondate");
     }
 
+    /**
+     * Removes the TaskObj at position and all children
+     *
+     * @param position - int position of the TaskObj to remove
+     */
+    public void remove(int position) {
+        childList.remove(getChildAt(position));
+    }
+
     /*
      * Getters
      */
@@ -589,19 +597,30 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
      * Returns the number of subtasks for this task (this level only).
      */
     public int getChildCount() {
-        return childMap.size();
+        return childList.size();
     }
 
+    // TODO: Remove getChildIndex in favour of this method
     /**
      * Get the Index of the specified Child/subtask
      *
      * @param TaskObj child - this is a child object / subtask to fine the index of
      * @return int - index of the specified child
      */
+    public int getIndex(TreeTableNode child) {
+        return getChildIndex( (TaskObj) child);
+    }
+
+    /**
+     * Get the Index of the specified Child/subtask
+     *
+     * @param TaskObj child - this is a child object / subtask to find the index of
+     * @return int - index of the specified child
+     */
     public int getChildIndex(TaskObj child) {
-        for (Map.Entry<Integer, TaskObj> aChild : childMap.entrySet()) {
-            if (aChild.getValue() == child) return aChild.getKey();
-        }
+        if(childList.contains(child))
+            return childList.indexOf(child);
+
         System.out.println("Error: Asked for a childs position that does not exist!");
         return 0;
     }
@@ -613,7 +632,8 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
      * @return TaskObj - child/subtask at that location
      */
     public TaskObj getChildAt(int index) {
-        return childMap.get(index+1);
+        if(index < childList.size()) return childList.get(index);
+        return null;
     }
 
     /**
@@ -639,7 +659,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
     }
 
     public void addChild(TaskObj child) {
-        childMap.put(childMap.size()+1, child);
+        childList.add(child);
         // Set the given parent
         child.setParent(this);
         // Tell the parent TaskObj that the number of children has changed
@@ -724,12 +744,12 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
     }
 
     /**
-     * If there are no children (subtasks) in the childMap then return true, otherwise false.
+     * If there are no children (subtasks) then return true, otherwise false.
      *
      * @return boolean - true if this object contains children (subtasks), false if not
      */
     public boolean hasChildren() {
-        if (childMap.size() == 0) return false;
+        if (childList.size() == 0) return false;
         return true;
     }
 
