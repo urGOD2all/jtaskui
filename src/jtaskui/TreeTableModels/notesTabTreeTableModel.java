@@ -1,6 +1,6 @@
 package jtaskui.TreeTableModels;
 
-import jtaskui.TaskObj;
+import jtaskui.Task.NoteObj;
 
 import TreeTable.AbstractTreeTableModel;
 import TreeTable.TreeTableModel;
@@ -12,7 +12,7 @@ public class notesTabTreeTableModel extends AbstractTreeTableModel {
     private static final long serialVersionUID = 1L;
 
     // This object will be the top of the TreeTable
-    private TaskObj root;
+    private NoteObj root;
 
     // This Arraylist will store all the names of the columns
     private ArrayList<String> columnNames;
@@ -31,7 +31,7 @@ public class notesTabTreeTableModel extends AbstractTreeTableModel {
         this.addColumn("Modification Date");
     }
 
-    public notesTabTreeTableModel(TaskObj root) {
+    public notesTabTreeTableModel(NoteObj root) {
         this();
         this.root = root;
     }
@@ -48,17 +48,17 @@ public class notesTabTreeTableModel extends AbstractTreeTableModel {
     }
 
     /**
-     * Gets the value from the TaskObj for the specified column.
+     * Gets the value from the NoteObj for the specified column.
      *
-     * @param node - A TaskObj that is in the table being inspected
+     * @param node - A NoteObj that is in the table being inspected
      * @param columnIndex - The column index from the table that is being inspected
      *
-     * @Return Object - Data for the column specified from the TaskObj
+     * @Return Object - Data for the column specified from the NoteObj
      */
 // TODO: Check if need a column converstion here
     @Override
     public Object getValueAt(Object node, int columnIndex) {
-        return this.getValueForColumn((TaskObj) node, columnIndex);
+        return this.getValueForColumn((NoteObj) node, columnIndex);
     }
 
    /**
@@ -91,8 +91,8 @@ public class notesTabTreeTableModel extends AbstractTreeTableModel {
      */
     @Override
     public int getIndexOfChild(Object parent, Object child) {
-        TaskObj parentTask = (TaskObj) parent;
-        TaskObj childTask = (TaskObj) child;
+        NoteObj parentTask = (NoteObj) parent;
+        NoteObj childTask = (NoteObj) child;
         return parentTask.getSubNoteIndex(childTask);
     }
 
@@ -104,55 +104,55 @@ public class notesTabTreeTableModel extends AbstractTreeTableModel {
      */
     @Override
     public boolean isLeaf(Object node) {
-        TaskObj task = (TaskObj) node;
-        return ! task.hasSubNote();
+        NoteObj note = (NoteObj) node;
+        return ! note.hasSubNote();
     }
 
     /**
-     * Get the number of child tasks from the parent
+     * Get the number of child notes from the parent
      *
      * @param parent - Object of the parent to get child count for
      * @return int - number of child objects
      */
     @Override
     public int getChildCount(Object parent) {
-        // Cast to a TaskObj
-        TaskObj parentTask = (TaskObj) parent;
+        // Cast to a NoteObj
+        NoteObj parentNote = (NoteObj) parent;
         // Return the number of children
-        return parentTask.getSubNoteCount();
+        return parentNote.getSubNoteCount();
     }
 
     /**
-     * Gets the child/subtask from the parent at the given index
+     * Gets the child/sub-note from the parent at the given index
      *
-     * @param parent - Object of the parent, will be cast to TaskObj
+     * @param parent - Object of the parent, will be cast to NoteObj
      * @param index - int position of the child to retrieve
      *
-     * @return Object - Object of type TaskObj will be child/subtask at the given location index
+     * @return Object - Object of type NoteObj will be child/sub-note at the given location index
      */
     @Override
     public Object getChild(Object parent, int index) {
-        // Cast to a TaskObj
-        TaskObj task = (TaskObj) parent;
+        // Cast to a NoteObj
+        NoteObj note = (NoteObj) parent;
         // Return the child at index
-        return task.getSubNoteAt(index);
+        return note.getSubNoteAt(index);
     }
 
     /**
      * Get the root object for this TreeTable
      *
-     * @return TaskObj - root object. This TaskObj wont have any data, just subtasks
+     * @return NoteObj - root object.
      */
     @Override
-    public TaskObj getRoot() {
+    public NoteObj getRoot() {
         return root;
     }
 
     /**
-     * Add a column to the TreeTable. The column names are fixed because they must be something that the TaskObj supports hence this is private.
+     * Add a column to the TreeTable. The column names are fixed because they must be something that the NoteObj supports hence this is private.
      * This model will setup all the relevant columns.
      *
-     * @param col - String representing the column name. This will map to something in TaskObj
+     * @param col - String representing the column name. This will map to something in NoteObj
      */
     private void addColumn(String col) {
         columnNames.add(col);
@@ -160,27 +160,27 @@ public class notesTabTreeTableModel extends AbstractTreeTableModel {
 
     /**
      * This method will get the value associated with the columnIndex only for the columns that are on show in the view.
-     * The columnIndex will get translated by column name to the correct method call against the task.
+     * The columnIndex will get translated by column name to the correct method call against the note.
      *
-     * @param task - A TaskObj that the column data will be retieved for
+     * @param note - A NoteObj that the column data will be retieved for
      * @param columnIndex - the column position to retrieve
      */
-    private Object getValueForColumn(TaskObj task, int columnIndex) {
+    private Object getValueForColumn(NoteObj note, int columnIndex) {
         String colName = this.getColumnName(columnIndex);
 
         // Call the right method for the right column name
         switch (colName) {
             case "Note Subject":
-                return task.getSubject();
+                return note.getSubject();
             case "Description":
-                return task.getDescription();
+                return note.getDescription();
             case "Attachments":
                 // TODO: Fix attachments
                 return "Currently not supported";
             case "Creation Date":
-                return task.getCreationDateTime();
+                return note.getCreationDateTime();
             case "Modification Date":
-                return task.getModificationDateTime();
+                return note.getModificationDateTime();
             default:
                 return "ERROR: Failed to getValueAt " + columnIndex + " for " + colName;
         }

@@ -1,5 +1,7 @@
 package jtaskui;
 
+import jtaskui.Task.NoteObj;
+
 import TreeTable.TreeTableNode;
 
 import java.util.HashMap;
@@ -15,7 +17,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 // TODO: Interesting observation, my test setup has Tasks with IDs that are mostly the same, look into this further
-// TODO: as we now use this for notes as there is much overlap, we should consider perhaps having an enum to tell us what type of object this is ?
 public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
     // This is a map of all the attributes that the task has
     private HashMap<String, String> attributes;
@@ -33,12 +34,10 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
     private HashMap<String, String> unsupportedItems;
 
     // This is a List of all the child tasks
-    private ArrayList<TaskObj> childList = new ArrayList<TaskObj>();
+    private ArrayList<TaskObj> childList;
 
-    // TODO: I dont like this, I think its naff. I think the better option would be to use a sortable Collection like TreeSet
-    //  // TODO (cont.) : I can get that TreeSet Collection from a Vector so maybe this is best served as a Vector object ?
-    // This is a Map of all the notes
-    private HashMap<Integer, TaskObj> notesMap = new HashMap<Integer, TaskObj>();
+    // This is the "root" object for all Notes of this Task
+    private NoteObj notes;
 
     // Used to store the parent of this task. Will be null if this is the root
     private TaskObj parent;
@@ -50,7 +49,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
 
     // Formatter objects for converting the date time format from TaskCoach stored format and the display format
     private DateTimeFormatter readInDateFormat, dateDisplayFormat;
-    private final String dateDisplayFormatString = "yyyy-MM-dd HH:mm";
+    private static final String dateDisplayFormatString = "yyyy-MM-dd HH:mm";
 
     // Fields for Date and Time formats
     private static final String HIGH_PRECISION_FORMAT  = "yyyy-MM-dd HH:mm:ss.SSSSSS";
@@ -82,6 +81,8 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
      * Constructor to initialise this TaskObj
      */
     private TaskObj() {
+        // Initialise the childList ArrayList
+        childList = new ArrayList<TaskObj>();
         // Initialise the attributes HashMap
         attributes = new HashMap<String, String>();
         // Initialise the unsupported attributes HashMap
@@ -190,7 +191,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
             setCreationDateTime(value.format(TaskObj.CREATION_DATE_FORMATTER));
         }
         catch(Exception e) {
-            System.out.println("ERROR: Cannot set creation date/time from " + value + " for " + getSubject());
+            System.err.println("ERROR: Cannot set creation date/time from " + value + " for " + getSubject());
         }
     }
 
@@ -367,7 +368,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
             return Integer.parseInt(getAttribute("status"));
         }
         catch(NumberFormatException nfe) {
-            System.out.println("ERROR: Failed to parse status, setting to 1");
+            System.err.println("ERROR: Failed to parse status, setting to 1");
         }
         finally {
             setStatus("1");
@@ -430,7 +431,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         }
         catch(DateTimeParseException dtpe) {
         // TODO: Make errors like this come up either in a console or as an error message
-            System.out.println("Error parsing datetime for " + dateTime + " in " + dateDisplayFormatString + " format");
+            System.err.println("Error parsing datetime for " + dateTime + " in " + dateDisplayFormatString + " format");
             return "N/A";
         }
     }
@@ -621,7 +622,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         if(childList.contains(child))
             return childList.indexOf(child);
 
-        System.out.println("Error: Asked for a childs position that does not exist!");
+        System.err.println("Error: Asked for a childs position that does not exist!");
         return 0;
     }
 
@@ -633,6 +634,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
      */
     public TaskObj getChildAt(int index) {
         if(index < childList.size()) return childList.get(index);
+        System.err.println("ERROR: Returning NULL for index " + index + " on " + this);
         return null;
     }
 
@@ -662,6 +664,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         childList.add(child);
         // Set the given parent
         child.setParent(this);
+        // TODO: Children should not tell parents that stats need updating, I think they should just know....
         // Tell the parent TaskObj that the number of children has changed
         if (getParent() != null) getParent().updateStats();
         // Else, this object is the root of the tree so needs to know objects have been added at this level
@@ -696,52 +699,57 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         if(getParent() != null) getParent().incrementCompletedCount();
     }
 
-    // TODO: Need to handle notes better than this
-    public void addNote(TaskObj note) {
-        // Add the note to the notes map
-        notesMap.put(notesMap.size()+1, note);
+    /*
+     * Notes
+     */
+
+    /**
+     * Add a top-level note to this Task. This will get added to the "NOTE ROOT" object
+     * for this TaskObj. Sub-notes are managed by NoteObj.
+     */
+    public void addNote(NoteObj note) {
+        // If the TaskObj contains no notes this will be null, create it now
+        if(notes == null) notes = new NoteObj("NOTE ROOT");
+        // Add the new note to the "NOTE ROOT" NoteObj
+        notes.addChild(note);
     }
 
     /**
-     * If there are subnotes (notes with children) in the notesMap then return true, otherwise false.
+     * If there are sub-notes (notes with children) in the NoteObj notes, then return true, otherwise false.
      *
      * @boolean - true if this object contains subnotes, false if not.
      */
     public boolean hasSubNote() {
+        // If this Task has no Notes yet, return false
         if (getSubNoteCount() == 0) return false;
+        // Must be true at this point
         return true;
     }
 
     /**
-     * Get the child subnotes from the specified index
+     * Returns the number of sub-notes for this task (top-level only).
      *
-     * @param index - int position of the child to query
-     * @return TaskObj - child/subnote at that location
-     */
-    public TaskObj getSubNoteAt(int index) {
-        return notesMap.get(index+1);
-    }
-
-    /**
-     * Get the Index of the specified Child/subnote
-     *
-     * @param TaskObj child - this is a child object / subnote to find the index of
-     * @return int - index of the specified subnote
-     */
-    public int getSubNoteIndex(TaskObj note) {
-        for (Map.Entry<Integer, TaskObj> aSubNote : notesMap.entrySet()) {
-            if(aSubNote.getValue() == note) return aSubNote.getKey();
-        }
-        System.out.println("Error: Asked for a subnote position that does not exist!");
-        return 0;
-    }
-
-    /**
-     * Returns the number of subtasks for this task (this level only).
+     * @return int - number of sub-notes from the "NOTE ROOT"
      */
     public int getSubNoteCount() {
-        return notesMap.size();
+        // If this Task has no Notes yet, return 0
+        if(notes == null) return 0;
+        // Return the number of children for the "NOTE ROOT"
+        return notes.getChildCount();
     }
+
+    /**
+     * Returns the "NOTE ROOT" NoteObj for this Task.
+     * 
+     * @return NoteObj - Root of all notes for this Task
+     */
+    public NoteObj getNoteRoot() {
+        return notes;
+    }
+
+    /*
+     * Task helpers
+     */
 
     /**
      * If there are no children (subtasks) then return true, otherwise false.

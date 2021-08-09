@@ -1,6 +1,7 @@
 package jtaskui.Input;
 
 import jtaskui.TaskObj;
+import jtaskui.Task.NoteObj;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
@@ -134,8 +135,8 @@ public class TaskObjXMLReader {
                         break;
                     // This is a note (or subnote) for the parent
                     case "note":
-                        // TODO: Make a constructor better suited to notes
-                        TaskObj note = new TaskObj("NOTE");
+                        // Create a new NoteObj
+                        NoteObj note = new NoteObj("NOTE");
                         // Pass the attributes to the note
                         note.populateAttributes(readNodeAttributes(node.getAttributes()));
                         // Add this task to its parent
