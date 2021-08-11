@@ -138,9 +138,9 @@ public class TaskObjXMLWriter {
         // If this has children then we will have to get them and recurse
         if(task.hasChildren()) {
             while(i < task.getChildCount()) {
-                i = i + 1;
                 // Recurse with this child and use this Task XML element (e) as the branch
                 buildDoc(task.getChildAt(i), e);
+                i = i + 1;
             }
         }
 
@@ -154,6 +154,7 @@ public class TaskObjXMLWriter {
         catch (Exception e) {
             System.out.println("There was an error while attempting to write to " + filename);
             System.out.println(e.toString());
+            e.printStackTrace();
         }
     }
 }
