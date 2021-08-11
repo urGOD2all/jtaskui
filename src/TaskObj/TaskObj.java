@@ -772,7 +772,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
     }
 
     public boolean hasDescription() {
-        if (getDescription() == null) return false;
+        if (getDescription() == "") return false;
         return true;
     }
 
