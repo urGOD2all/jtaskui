@@ -131,7 +131,7 @@ public class TaskObjXMLReader {
                         break;
                     // This is the parents description object
                     case "description":
-                        if (node.getTextContent() != null) parentTask.setDescription(node.getTextContent().substring(0, node.getTextContent().length()-1));
+                        if (node.getTextContent() != null) parentTask.setDescription(node.getTextContent());
                         break;
                     // This is a note (or subnote) for the parent
                     case "note":
