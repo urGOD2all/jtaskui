@@ -1,6 +1,7 @@
 package jtaskui.Output;
 
 import jtaskui.TaskObj;
+import jtaskui.Task.NoteObj;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -131,6 +132,20 @@ public class TaskObjXMLWriter {
                 e.appendChild(desc);
             }
 
+            // Add all the notes to this element
+            if(task.hasSubNote()) {
+                while(i < task.getSubNoteCount()) {
+                    // Create the parent (top-level) note
+                    Element ne = doc.createElement("note");
+                    // Recurse all notes and the children
+                    buildNotes(task.getNoteRoot().getSubNoteAt(i), ne);
+                    // Add the parent (top-level) note to the Task
+                    e.appendChild(ne);
+                    i = i + 1;
+                }
+            }
+            // Reset i
+            i = 0;
             // Add this Task Element to the XML Element branch
             branch.appendChild(e);
         }
@@ -143,7 +158,50 @@ public class TaskObjXMLWriter {
                 i = i + 1;
             }
         }
+    }
 
+    /**
+     * Recursive method to build the XML Element for Notes
+     *
+     * @param NoteObj - A Note, if the Note has children then this will recurse them all
+     * @param Element - An XML Element that the Note will either construct or append a new XML "note" element to
+     */
+    private void buildNotes(NoteObj note, Element e) {
+        Element noteElement;
+        // If the passed in note already has a subject then this note must be its child.
+        if(e.hasAttribute("subject")) {
+            // Create a new noteElement
+            noteElement = doc.createElement("note");
+            // Add this new Element to the parent
+            e.appendChild(noteElement);
+        }
+        // Else we are dealing with a top-level note
+        else {
+            noteElement = e;
+        }
+
+        // Set the standard note attributes
+        for(Map.Entry<String, String> attribute : note.getAttributes().entrySet()) {
+            noteElement.setAttribute(attribute.getKey(), attribute.getValue());
+        }
+
+        // Set the description if it exists
+        if(note.hasDescription()) {
+            // Create an Element for the description
+            Element desc = doc.createElement("description");
+            // Add the Task Description content
+            desc.setTextContent(note.getDescription());
+            // Add this description Element to this Task Element
+            noteElement.appendChild(desc);
+        }
+
+        int i = 0;
+        // While there are child notes...
+        while(i < note.getSubNoteCount()) {
+            // Get the child Note at i and send the current noteElement as its parent
+            buildNotes(note.getSubNoteAt(i), noteElement);
+            i = i + 1;
+        }
     }
 
     public void write() {
