@@ -147,6 +147,9 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
                 case "completiondate":
                     setCompletionDateTime(attr.getValue());
                     break;
+                case "reminder":
+                    setReminderDateTime(attr.getValue());
+                    break;
                 case "status":
                     setStatus(attr.getValue());
                     break;
@@ -268,6 +271,31 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         }
     }
 
+    /**
+     * Set the reminder Date/Time on this Task.
+     * This method is not validatated and accepts a raw String. It should only be used internally when reading
+     * data from the data source.
+     *
+     * @param String - new Reminder Date/Time
+     */
+    private void setReminderDateTime(String value) {
+        attributes.put("reminder", value);
+    }
+
+    /**
+     * Set the reminder Date/Time on this Task
+     *
+     * @param LocalDateTime - new reminder Date/Time
+     */
+    public void setReminderDateTime(LocalDateTime value) {
+        try {
+            setReminderDateTime(value.format(TaskObj.REMINDER_DATE_FORMATTER));
+        }
+        catch(Exception e) {
+            removeReminderDateTime();
+        }
+    }
+
     private void setPercentageComplete(String value) {
         attributes.put("percentageComplete", value);
     }
@@ -330,6 +358,13 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
 
     private void removeCompletionDateTime() {
         attributes.remove("completiondate");
+    }
+
+    /**
+     * Removes the reminder attribute from this Task
+     */
+    private void removeReminderDateTime() {
+        attributes.remove("reminder");
     }
 
     /**
@@ -516,6 +551,13 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         return getAttribute("completiondate");
     }
 
+    /**
+     * Returns a String representation of the reminder attributes. This is the raw value from the datasource.
+     */
+    private String getReminderDateTime() {
+        return getAttribute("reminder");
+    }
+
     /*
      * Public LocalDateTime formatted date/time getters methods
      */
@@ -541,7 +583,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
     /**
      * Returns a correctly formatted Planned Start date in a LocalDateTime object
      *
-     * @return LocalDateTime - Task due date
+     * @return LocalDateTime - Task planned start date
      */
     public LocalDateTime getPlannedStartLocalDateTime() {
         return parseDateTime(getPlannedStartDateTime(), TaskObj.PLANNED_DATE_FORMATTER);
@@ -550,10 +592,19 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
     /**
      * Returns a correctly formatted Actual Start date in a LocalDateTime object
      *
-     * @return LocalDateTime - Task due date
+     * @return LocalDateTime - Task actual start date
      */
     public LocalDateTime getActualStartLocalDateTime() {
         return parseDateTime(getActualStartDateTime(), TaskObj.ACTUAL_DATE_FORMATTER);
+    }
+
+    /**
+     * Returns a correctly formatted Reminder date/time in a LocalDateTime object
+     *
+     * @return LocalDateTime - Task reminder date
+     */
+    public LocalDateTime getReminderLocalDateTime() {
+        return parseDateTime(getReminderDateTime(), TaskObj.REMINDER_DATE_FORMATTER);
     }
 
     /**
@@ -788,6 +839,16 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
 
     public boolean hasActualStartDate() {
         if(hasAttribute("actualstartdate")) return true;
+        else return false;
+    }
+
+    /**
+     * Returns true if a reminder is set for this Task, false otherwise
+     *
+     * @return boolean - if the reminder attribute is set, otherwise returns false
+     */
+    public boolean hasReminder() {
+        if(hasAttribute("reminder")) return true;
         else return false;
     }
 
