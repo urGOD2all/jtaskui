@@ -101,14 +101,15 @@ public class datesTab {
 
         // Reminder section
         // TODO: FIX ME
-        reminderCheck = new JCheckBox("Reminder", false);
+        reminderCheck = new JCheckBox("Reminder", task.hasReminder());
         reminderCheck.setHorizontalTextPosition(SwingConstants.LEFT);
         reminderCheck.addActionListener(e -> reminderChanged());
 
-        JTextArea reminderDateOLD = new JTextArea("MISSING FEATURE");
+        reminderDate = buildDateTimePicker(task.getReminderLocalDateTime(), task.hasReminder());
+        reminderDate.addDateTimeChangeListener(e -> reminderChanged());
 
         lm.addNext(reminderCheck);
-        lm.addNext(reminderDateOLD);
+        lm.addNext(reminderDate);
 
         // Insert separator
         lm.addSeparator();
@@ -181,9 +182,13 @@ public class datesTab {
 
     // TODO: Implement this
     private void reminderChanged() {
-        System.out.println("Reminder STUB");
-//        reminderDate.setEnabled(reminderCheck.isSelected());
-        //task.updateModificationDateTime();
+        // Toggle the DatePicker state dependard on the checkbox selection
+        reminderDate.setEnabled(reminderCheck.isSelected());
+
+        // If the check box is selected, set the date/time on this TaskObj - If its not selected, send a null to unset it
+        if(reminderCheck.isSelected()) task.setReminderDateTime(reminderDate.getDateTimePermissive());
+        else task.setReminderDateTime(null);
+        task.updateModificationDateTime();
     }
 
     /**
