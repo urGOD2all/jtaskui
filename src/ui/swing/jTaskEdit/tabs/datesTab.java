@@ -100,7 +100,6 @@ public class datesTab {
         lm.addSeparator();
 
         // Reminder section
-        // TODO: FIX ME
         reminderCheck = new JCheckBox("Reminder", task.hasReminder());
         reminderCheck.setHorizontalTextPosition(SwingConstants.LEFT);
         reminderCheck.addActionListener(e -> reminderChanged());
@@ -170,6 +169,7 @@ public class datesTab {
      * Called when the Checkbox or the DatePicker is changed.
      * Enables/disables the DatePicker and sets the selected date and time on this TaskObj
      */
+    // TODO: If a task is completed then it should disable use of reminders
     private void completionDateChanged() {
         // Toggle the DatePicker state dependard on the checkbox selection
         completionDate.setEnabled(completionDateCheck.isSelected());
@@ -180,7 +180,10 @@ public class datesTab {
         task.updateModificationDateTime();
     }
 
-    // TODO: Implement this
+    /**
+     * Called when the Checkbox or the DatePicker is changed.
+     * Enables/disables the DatePicker and sets the selected date and time on this TaskObj
+     */
     private void reminderChanged() {
         // Toggle the DatePicker state dependard on the checkbox selection
         reminderDate.setEnabled(reminderCheck.isSelected());
