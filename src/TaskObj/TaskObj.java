@@ -265,6 +265,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
     public void setCompletionDateTime(LocalDateTime value) {
         try {
             setCompletionDateTime(value.format(TaskObj.COMPLETION_DATE_FORMATTER));
+            if(isComplete()) removeReminderDateTime();
         }
         catch(Exception e) {
             removeCompletionDateTime();
