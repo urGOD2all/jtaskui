@@ -2,6 +2,8 @@ package jtaskui;
 
 import jtaskui.Task.NoteObj;
 
+import jtaskui.scheduler.scheduleHandler;
+
 import TreeTable.TreeTableNode;
 
 import java.util.HashMap;
@@ -15,6 +17,8 @@ import java.util.UUID;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+
+import javax.swing.tree.TreePath;
 
 // TODO: Interesting observation, my test setup has Tasks with IDs that are mostly the same, look into this further
 public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
@@ -42,10 +46,17 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
     // Used to store the parent of this task. Will be null if this is the root
     private TaskObj parent;
 
+    // Used to store the full path of the task heirachy
+    TreePath fullPath;
+
+
     // Store the number of all subtasks in the children
     private int subTaskCount;
     private int startedCount;
     private int completedCount;
+
+    // Reference to the scheduler for setting reminders
+    private scheduleHandler scheduleHandler;
 
     // Formatter objects for converting the date time format from TaskCoach stored format and the display format
     private DateTimeFormatter readInDateFormat, dateDisplayFormat;
@@ -106,12 +117,22 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
      *
      * @param subject - String representing the subject of the Task
      */
-    public TaskObj(String subject) {
+    private TaskObj(String subject) {
         this();
         setID(UUID.randomUUID().toString());
         setSubject(subject);
         // Initialise an empty description
         setDescription("");
+    }
+
+    /**
+     * Constructor to accept the subject and Schedule handler for setting reminders.
+     * I don't really like doing it this way but it is the easiest way for now. It can/will be refactored
+     * at a later time.
+     */
+    public TaskObj(String subject, scheduleHandler scheduleHandler) {
+        this(subject);
+        this.scheduleHandler = scheduleHandler;
     }
 
     /*
@@ -281,6 +302,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
      */
     private void setReminderDateTime(String value) {
         attributes.put("reminder", value);
+        scheduleHandler.schedule(this, true);
     }
 
     /**
@@ -443,6 +465,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
             return LocalDateTime.parse(dateTime, inFormat);
         }
         catch (DateTimeParseException e) {
+            System.err.println(getSubject());
             System.err.println("ERROR: Failed to parse " + dateTime + " - Expected format " + inFormat);
             return LocalDateTime.now();
         }
@@ -712,15 +735,59 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         return parent;
     }
 
-    public void addChild(TaskObj child) {
-        childList.add(child);
+    /**
+     * Get the TreePath leading back to, but not including, the root
+     *
+     * @return TreePath - Full path of the Task
+     */
+    public TreePath getPath() {
+        if (fullPath == null) return new TreePath(this);
+        return fullPath;
+    }
+
+    /**
+     * Returns a pretty printed Srting version of the Task path.
+     * Each part of the path is seperated by -> in this String
+     *
+     * @return String - full pretty path
+     */
+    public String getPrettyPath() {
+        StringBuilder s = new StringBuilder();
+        for (int i = 0; i < fullPath.getPathCount(); i++) {
+            s.append(fullPath.getPathComponent(i));
+            if (fullPath.getPathCount() != i+1) s.append(" -> ");
+        }
+
+        return s.toString();
+    }
+
+    /**
+     * Updates the path of this Task to the one specified
+     *
+     * @param TreePath - new path to set
+     */
+    private void setPath(TreePath newPath) {
+        fullPath = newPath;
+    }
+
+    public void insert(TreeTableNode child, int position) {
+        TaskObj newChild = (TaskObj) child;
+        if((this.getChildCount()+1) == position) childList.add(newChild);
+        else childList.add(position, newChild);
+
         // Set the given parent
-        child.setParent(this);
+        newChild.setParent(this);
+        if (fullPath == null) newChild.setPath(new TreePath(newChild));
+        else newChild.setPath(getPath().pathByAddingChild(newChild));
         // TODO: Children should not tell parents that stats need updating, I think they should just know....
         // Tell the parent TaskObj that the number of children has changed
         if (getParent() != null) getParent().updateStats();
         // Else, this object is the root of the tree so needs to know objects have been added at this level
         else updateStats();
+    }
+
+    public void addChild(TaskObj child) {
+        insert(child, this.getChildCount()+1);
     }
 
     private void updateStats() {

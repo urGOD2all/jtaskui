@@ -19,7 +19,7 @@ public class NoteObj extends TaskObj {
      * @param String - subject of this Note
      */
     public NoteObj(String subject) {
-        super(subject);
+        super(subject, null);
     }
 
     /**

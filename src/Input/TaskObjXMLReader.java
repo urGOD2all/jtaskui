@@ -2,6 +2,7 @@ package jtaskui.Input;
 
 import jtaskui.TaskObj;
 import jtaskui.Task.NoteObj;
+import jtaskui.scheduler.scheduleHandler;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
@@ -27,6 +28,7 @@ public class TaskObjXMLReader {
     private DocumentBuilderFactory docBuilderFactory;
     private DocumentBuilder docBuilder;
     private Document doc;
+    private scheduleHandler scheduler;
 
     private TaskObjXMLReader() {
         // Connected is false by default
@@ -35,11 +37,12 @@ public class TaskObjXMLReader {
         docBuilderFactory = DocumentBuilderFactory.newInstance();
     }
 
-    public TaskObjXMLReader(String filename, TaskObj rootTask) {
+    public TaskObjXMLReader(String filename, TaskObj rootTask, scheduleHandler scheduler) {
         this();
         this.filename = filename;
+        this.scheduler = scheduler;
 
-        if (rootTask == null) this.rootTask = new TaskObj("ROOT");
+        if (rootTask == null) this.rootTask = new TaskObj("ROOT", scheduler);
         else this.rootTask = rootTask;
     }
 
@@ -120,7 +123,7 @@ public class TaskObjXMLReader {
                     // This is a subtask of the parent
                     case "task":
                         // TODO: Make a constuctor that will take a hash map of attributes ?
-                        TaskObj childTask = new TaskObj("NEW CHILD");
+                        TaskObj childTask = new TaskObj("NEW CHILD", scheduler);
                         // Pass the attributes to the child
                         childTask.populateAttributes(readNodeAttributes(node.getAttributes()));
                         // Add this task to its parent

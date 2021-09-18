@@ -15,6 +15,8 @@ import jtaskui.Output.*;
 
 import jtaskui.ui.swing.jTaskEdit.jTaskEdit;
 
+import jtaskui.scheduler.scheduleHandler;
+
 import javax.swing.SwingUtilities;
 
 import java.awt.Component;
@@ -61,6 +63,8 @@ public class jTaskView implements jtvListener {
     private jTaskViewTreeTableModel treeTableModel;
     // The TaskObj for root that is passed to the TreeTableModel
     private TaskObj root;
+    // The scheduler, responsible for scheduling operations for reminders
+    private scheduleHandler scheduleHandler;
 
     /*
      * Constructors
@@ -70,7 +74,8 @@ public class jTaskView implements jtvListener {
      * Default constructor
      */
     public jTaskView() {
-        this.root = new TaskObj("ROOT");
+        scheduleHandler = new scheduleHandler();
+        this.root = new TaskObj("ROOT", scheduleHandler);
     }
 
     /**
@@ -156,7 +161,7 @@ public class jTaskView implements jtvListener {
                     });
                 }
             }
-        }); 
+        });
 
         // Add the TreeTable to the scroll pane
         JScrollPane rootScrollpane = new JScrollPane(taskTreeTable);
@@ -206,6 +211,15 @@ public class jTaskView implements jtvListener {
      */
     private TreeTable getTaskTable() {
         return taskTreeTable;
+    }
+
+    /**
+     * Returns the schedule handler used for scheduling reminders
+     *
+     * @return scheduleHandler - The scheduling handler
+     */
+    private scheduleHandler getScheduler() {
+        return scheduleHandler;
     }
 
     /*
@@ -272,7 +286,7 @@ public class jTaskView implements jtvListener {
         // Store the file path that was opened (also used by save)
         taskFilePath = filename;
         // Make an XML reader object
-        TaskObjXMLReader taskXMLReader = new TaskObjXMLReader(taskFilePath, this.root);
+        TaskObjXMLReader taskXMLReader = new TaskObjXMLReader(taskFilePath, this.root, getScheduler());
         // Connect to the data source
         taskXMLReader.connect();
         // Read the data source (this updates this.root which is passed in the constructor)
@@ -315,7 +329,8 @@ public class jTaskView implements jtvListener {
      * This is invoked when the File->Close menu item is clicked
      */
     public void jtvMenuBarFileClose() {
-        // TODO: do reset of TreeTable, close file handles etc etc....
+        // TODO: do reset of TreeTable, close file handles, cancel reminders etc etc....
+        //getScheduler().cancelAll();
     }
 
     /**
@@ -351,12 +366,8 @@ public class jTaskView implements jtvListener {
      * This is invoked when the New Task button is clicked
      */
     public void jtvTaskActionsNewTask() {
-        TaskObj newTask = new TaskObj("New Task");
-        getModel().getRoot().addChild(newTask);
-        int[] newIndexs = new int[1];
-        newIndexs[0] = getModel().getRoot().getChildCount()-1;
-        // Inform the TreeTable nodes have been inserted
-        getModel().nodesWereInserted(getModel().getRoot(), newIndexs);
+        TaskObj newTask = new TaskObj("New Task", getScheduler());
+        getModel().insertNodeInto(newTask, getModel().getRoot(), getModel().getRoot().getChildCount());
         // Launch a new editor window
         jTaskEdit jte = new jTaskEdit(newTask);
         jte.initGUI();
@@ -374,13 +385,8 @@ public class jTaskView implements jtvListener {
      */
     public void jtvTaskActionsNewSubTask() {
         TaskObj selectedTask = getSelectedTask();
-        TaskObj newTask = new TaskObj("New Sub Task");
-        selectedTask.addChild(newTask);
-        int[] newIndexs = new int[1];
-        newIndexs[0] = selectedTask.getChildCount()-1;
-        // Inform the TreeTable nodes have been inserted
-        getModel().nodesWereInserted(selectedTask, newIndexs);
-        // Launch a new editor window
+        TaskObj newTask = new TaskObj("New Sub Task", getScheduler());
+        getModel().insertNodeInto(newTask, selectedTask, selectedTask.getChildCount());
         jTaskEdit jte = new jTaskEdit(newTask);
         jte.initGUI();
     }
