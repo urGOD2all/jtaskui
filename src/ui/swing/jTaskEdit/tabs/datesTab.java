@@ -11,6 +11,7 @@ import com.github.lgooddatepicker.components.TimePickerSettings.TimeIncrement;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalTime;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import javax.swing.JPanel;
 import javax.swing.JLabel;
@@ -104,7 +105,9 @@ public class datesTab {
         reminderCheck.setHorizontalTextPosition(SwingConstants.LEFT);
         reminderCheck.addActionListener(e -> reminderChanged());
 
-        reminderDate = buildDateTimePicker(task.getReminderLocalDateTime(), task.hasReminder());
+        if(task.hasReminder()) reminderDate = buildDateTimePicker(task.getReminderLocalDateTime(), task.hasReminder());
+        // TODO: Make the default configurable
+        else reminderDate = buildDateTimePicker(LocalDate.now().plusDays(1).atTime(8, 0), task.hasReminder());
         reminderDate.addDateTimeChangeListener(e -> reminderChanged());
 
         lm.addNext(reminderCheck);

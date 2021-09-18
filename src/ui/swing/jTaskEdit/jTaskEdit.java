@@ -53,8 +53,7 @@ public class jTaskEdit implements ActionListener {
         efSouth.add(efSouthEast, BorderLayout.EAST);
 
         // Create the path label and add to the SOUTH WEST
-        // TODO: Get the full path correctly. ATM this only gets the parent and the current task as the path.
-        JLabel taskPath = new JLabel(task.getParent().getSubject() + " -> " + task.getSubject());
+        JLabel taskPath = new JLabel(task.getPrettyPath());
         efSouthWest.add(taskPath, BorderLayout.WEST);
 
         // Create the close button and add to SOUTH EAST
