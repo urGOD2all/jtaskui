@@ -68,7 +68,7 @@ public class jReminder {
         // Put a 10 pixel fixed spacer between the Task label and the Button
         row1.add(Box.createRigidArea(new Dimension(100, 0)));
         // Task button (opens the Task when actioned)
-        JButton taskButton = new JButton(task.getSubject());
+        JButton taskButton = new JButton(task.getPrettyPath());
         // Open the task in the editor when this button is clicked
         taskButton.addActionListener(e->taskOpen());
         // Set the minimum size of this button to 100 pixels to allow it to shrink when the UI is resized
@@ -206,6 +206,8 @@ public class jReminder {
         reminderFrame.setSize(new Dimension(30+(int)row1.getPreferredSize().getWidth(), 210));
         // Set the minimum size of all reminder windows so that all components will always be visible
         reminderFrame.setMinimumSize(new Dimension(460, 210));
+        // Center the reminder
+        reminderFrame.setLocationRelativeTo(null);
         // Show the UI
         reminderFrame.setVisible(true);
     }
