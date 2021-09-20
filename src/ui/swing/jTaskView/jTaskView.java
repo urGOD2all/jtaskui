@@ -39,6 +39,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import javax.swing.table.TableRowSorter;
 
+import javax.swing.tree.TreePath;
+
 // TODO: Remove this when the diag code is removed
 import java.util.Map;
 
@@ -146,6 +148,8 @@ public class jTaskView implements jtvListener {
         // TODO: Need to fix the warning when setting this
         treeTableRowSorter.setComparator(0, new TaskObjRowSorter(treeTableModel));
 
+        // TODO: This feels like a smell! It's only here because I need to pass it to the anonymous below!
+        jTaskView jtui = this;
         // TODO: Should this be here ?
         taskTreeTable.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent me) {
@@ -156,6 +160,7 @@ public class jTaskView implements jtvListener {
                         @Override
                         public void run() {
                             jTaskEdit jte = new jTaskEdit(getSelectedTask());
+                            jte.addListener(jtui);
                             jte.initGUI();
                         }
                     });
@@ -370,6 +375,7 @@ public class jTaskView implements jtvListener {
         getModel().insertNodeInto(newTask, getModel().getRoot(), getModel().getRoot().getChildCount());
         // Launch a new editor window
         jTaskEdit jte = new jTaskEdit(newTask);
+        jte.addListener(this);
         jte.initGUI();
     }
 
@@ -388,7 +394,23 @@ public class jTaskView implements jtvListener {
         TaskObj newTask = new TaskObj("New Sub Task", getScheduler());
         getModel().insertNodeInto(newTask, selectedTask, selectedTask.getChildCount());
         jTaskEdit jte = new jTaskEdit(newTask);
+        jte.addListener(this);
         jte.initGUI();
+    }
+
+    /**
+     * This is invoked when something external causes a change to the data that
+     * requires the Task TreeTable be updated
+     */
+    public void jtvUpdateTaskTreeTable(TreePath path, String columnName) {
+        // TODO: This is required because TaskObj.getPath() doesnt include the ROOT object
+        TreePath p = new TreePath(getModel().getRoot());
+        for(int i = 0; i < path.getPathCount(); i++) {
+            p = p.pathByAddingChild(path.getPathComponent(i));
+        }
+        //System.out.println(p + " " + columnName + " " + getModel().findColumn(columnName));
+        // Notify the model of the relevant change
+        getModel().valueForPathChanged(p, getModel().findColumn(columnName));
     }
 
     private int getSelectedRow() {

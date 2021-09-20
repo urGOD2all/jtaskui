@@ -1,5 +1,7 @@
 package jtaskui.ui.swing.jTaskView;
 
+import javax.swing.tree.TreePath;
+
 /**
  * Interface that sets up the contract between UI componenets of jTaskView
  */
@@ -25,4 +27,9 @@ public interface jtvListener {
     void jtvTaskActionsNewSubTask();
 
     void jtvTaskActionsDeleteTask();
+
+    /*
+     * Main Task UI frame updates
+     */
+    void jtvUpdateTaskTreeTable(TreePath path, String columnName);
 }

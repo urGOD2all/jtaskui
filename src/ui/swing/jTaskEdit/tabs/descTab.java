@@ -1,6 +1,10 @@
 package jtaskui.ui.swing.jTaskEdit.tabs;
 
 import jtaskui.TaskObj;
+import jtaskui.ui.swing.jTaskView.jtvListener;
+
+import java.util.List;
+import java.util.ArrayList;
 
 import java.awt.event.FocusListener;
 import java.awt.event.FocusEvent;
@@ -14,6 +18,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 
 public class descTab implements FocusListener {
+    // Listeners to be notified when actions are performed
+    private List<jtvListener> listeners = new ArrayList<jtvListener>();
+
     private TaskObj task;
 
     private JTextArea subject;
@@ -113,11 +120,24 @@ public class descTab implements FocusListener {
         if(source == subject && !task.getSubject().equals(subject.getText())) {
             task.setSubject(subject.getText());
             task.updateModificationDateTime();
+            // Inform the UI of the update
+            for (jtvListener aListener : listeners) aListener.jtvUpdateTaskTreeTable(task.getPath(), "Task Subject");
         }
         else if(source == description && !description.getText().equals(task.getDescription())) {
             task.setDescription(description.getText());
             task.updateModificationDateTime();
+            for (jtvListener aListener : listeners) aListener.jtvUpdateTaskTreeTable(task.getPath(), "Description");
         }
         modificationDate.setText(task.getFormattedModificationDateTime());
+        for (jtvListener aListener : listeners) aListener.jtvUpdateTaskTreeTable(task.getPath(), "Modification Date");
+    }
+
+    /**
+     * Adds a listener to the listener list. These listeners will get notified when actions are performed.
+     *
+     * @param jtvListener - Class implementing the jtvListener interface
+     */
+    public void addListener(jtvListener listener) {
+        listeners.add(listener);
     }
 }

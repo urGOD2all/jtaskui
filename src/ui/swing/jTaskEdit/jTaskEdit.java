@@ -4,6 +4,10 @@ import jtaskui.TaskObj;
 import jtaskui.ui.swing.jTaskEdit.tabs.descTab;
 import jtaskui.ui.swing.jTaskEdit.tabs.datesTab;
 import jtaskui.ui.swing.jTaskEdit.tabs.notesTab;
+import jtaskui.ui.swing.jTaskView.jtvListener;
+
+import java.util.List;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
@@ -19,11 +23,16 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 public class jTaskEdit implements ActionListener {
+    // Listeners to be notified when actions are performed
+    private List<jtvListener> listeners = new ArrayList<jtvListener>();
+
     private TaskObj task;
     private JFrame editFrame;
     private JTabbedPane tPane;
     private JButton closeEditFrame;
     private JPanel editPanel;
+
+    private descTab dt;
 
     public jTaskEdit(TaskObj task) {
         // Store a reference to the TaskObj with all the information in it
@@ -36,9 +45,10 @@ public class jTaskEdit implements ActionListener {
         // Add the panel to the frame
         editFrame.add(editPanel);
         editFrame.setSize(1200,480);
-        editFrame.setVisible(true);
         // Create the tabbed pane
         tPane = new JTabbedPane();
+        // Initialise the descTab
+        dt = new descTab(task);
 
         editFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     }
@@ -62,7 +72,6 @@ public class jTaskEdit implements ActionListener {
         efSouthEast.add(closeEditFrame, BorderLayout.EAST);
 
         // Build each tab
-        descTab dt = new descTab(task);
         tPane.addTab("Description", dt.buildPanel());
         datesTab dat = new datesTab(task);
         tPane.addTab("Dates", dat.buildPanel());
@@ -81,6 +90,8 @@ public class jTaskEdit implements ActionListener {
         // Add components to the frames panel
         editPanel.add(tPane, BorderLayout.CENTER);
         editPanel.add(efSouth, BorderLayout.SOUTH);
+        // Make the frame visible
+        editFrame.setVisible(true);
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -90,5 +101,15 @@ public class jTaskEdit implements ActionListener {
         if(sourceEvent == closeEditFrame) {
             editFrame.dispose();
         }
+    }
+
+    /**
+     * Adds a listener to the listener list. These listeners will get notified when actions are performed.
+     *
+     * @param jtvListener - Class implementing the jtvListener interface
+     */
+    public void addListener(jtvListener listener) {
+        listeners.add(listener);
+        dt.addListener(listener);
     }
 }
