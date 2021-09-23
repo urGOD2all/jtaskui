@@ -60,6 +60,6 @@ public class NoteObj extends TaskObj {
      * @param NoteObj child - this is a child object / sub-note to find the index of
      */
     public int getSubNoteIndex(NoteObj note) {
-        return note.getIndex(note);
+        return getIndex(note);
     }
 }
