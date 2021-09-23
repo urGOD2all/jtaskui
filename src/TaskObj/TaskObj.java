@@ -697,7 +697,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         if(childList.contains(child))
             return childList.indexOf(child);
 
-        System.err.println("Error: Asked for a childs position that does not exist!");
+        System.err.println("Error: Asked for a childs position that does not exist! - " + child);
         return 0;
     }
 
@@ -786,6 +786,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         else updateStats();
     }
 
+    // TODO: Remove the use of this through the code in favour of insert.
     public void addChild(TaskObj child) {
         insert(child, this.getChildCount()+1);
     }
@@ -863,6 +864,8 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
      * @return NoteObj - Root of all notes for this Task
      */
     public NoteObj getNoteRoot() {
+        // If the TaskObj contains no notes this will be null, create it now
+        if(notes == null) notes = new NoteObj("NOTE ROOT");
         return notes;
     }
 
