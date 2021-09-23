@@ -2,6 +2,11 @@ package jtaskui.ui.swing.jNotesEdit;
 
 import jtaskui.ui.swing.jNotesEdit.tabs.descTab;
 import jtaskui.Task.NoteObj;
+import jtaskui.ui.swing.jTaskView.jtvListener;
+import jtaskui.ui.swing.jTaskEdit.tabs.notesListener;
+
+import java.util.List;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
@@ -13,6 +18,9 @@ import javax.swing.JTabbedPane;
 import javax.swing.JButton;
 
 public class jNotesEdit {
+    // Listeners to be notified when actions are performed
+    private List<notesListener> listeners = new ArrayList<notesListener>();
+
     // The note being worked on
     private NoteObj note;
 
@@ -20,6 +28,7 @@ public class jNotesEdit {
     private JPanel editPanel;
     private JTabbedPane tPane;
     private JButton closeEditFrame;
+    private descTab dt;
 
     public jNotesEdit(NoteObj note) {
         // Store a reference to the note being worked on
@@ -32,7 +41,6 @@ public class jNotesEdit {
         // Add the panel to the frame
         editFrame.add(editPanel);
         editFrame.setSize(850,480);
-        editFrame.setVisible(true);
         // Create the tabbed pane
         tPane = new JTabbedPane();
 
@@ -56,7 +64,7 @@ public class jNotesEdit {
         efSouthEast.add(closeEditFrame, BorderLayout.EAST);
 
         // Build each tab
-        descTab dt = new descTab(note);
+        dt = new descTab(note);
         tPane.addTab("Description", dt.buildPanel());
         //tPane.addTab("Description", new JPanel());
 
@@ -69,6 +77,8 @@ public class jNotesEdit {
         // Add components to the frames panel
         editPanel.add(tPane, BorderLayout.CENTER);
         editPanel.add(efSouth, BorderLayout.SOUTH);
+        // Make the frame visible
+        editFrame.setVisible(true);
     }
 
     /**
@@ -77,5 +87,15 @@ public class jNotesEdit {
     private void closeButton() {
         // Close the GUI
         editFrame.dispose();
+    }
+
+    /**
+     * Adds a listener to the listener list. These listeners will get notified when actions are performed.
+     *
+     * @param notesListener - Class implementing the jtvListener interface
+     */
+    public void addListener(notesListener listener) {
+        listeners.add(listener);
+        dt.addListener(listener);
     }
 }

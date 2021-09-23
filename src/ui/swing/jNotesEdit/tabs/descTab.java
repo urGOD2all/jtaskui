@@ -1,6 +1,10 @@
 package jtaskui.ui.swing.jNotesEdit.tabs;
 
 import jtaskui.Task.NoteObj;
+import jtaskui.ui.swing.jTaskEdit.tabs.notesListener;
+
+import java.util.List;
+import java.util.ArrayList;
 
 import java.awt.event.FocusListener;
 import java.awt.event.FocusEvent;
@@ -13,6 +17,9 @@ import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 
 public class descTab implements FocusListener {
+    // Listeners to be notified when actions are performed
+    private List<notesListener> listeners = new ArrayList<notesListener>();
+
     private NoteObj note;
 
     private JTextArea subject;
@@ -98,6 +105,8 @@ public class descTab implements FocusListener {
             note.setSubject(subject.getText());
             // Update the modification timestamp
             note.updateModificationDateTime();
+            // Update the Notes TreeTable on the jTaskEdit notesTab
+            for (notesListener aListener : listeners) aListener.jteNoteUpdateNoteTreeTable(note.getPath(), "Note Subject");
         }
         // If the source is description and the text has canged
         else if(source == description && !description.getText().equals(note.getDescription())) {
@@ -105,7 +114,11 @@ public class descTab implements FocusListener {
             note.setDescription(description.getText());
             // Update the modification timestamp
             note.updateModificationDateTime();
+            // Update the Notes TreeTable on the jTaskEdit notesTab
+            for (notesListener aListener : listeners) aListener.jteNoteUpdateNoteTreeTable(note.getPath(), "Description");
         }
+        // Update the Notes TreeTable on the jTaskEdit notesTab
+        for (notesListener aListener : listeners) aListener.jteNoteUpdateNoteTreeTable(note.getPath(), "Modification Date");
         // Update the modification date label on the panel to the one stored in the NoteObj
         modificationDate.setText(note.getFormattedModificationDateTime());
     }
@@ -114,5 +127,14 @@ public class descTab implements FocusListener {
      * Do nothing when focus is gained
      */
     public void focusGained(FocusEvent e) {
+    }
+
+    /**
+     * Adds a listener to the listener list. These listeners will get notified when actions are performed.
+     *
+     * @param notesListener - Class implementing the jtvListener interface
+     */
+    public void addListener(notesListener listener) {
+        listeners.add(listener);
     }
 }

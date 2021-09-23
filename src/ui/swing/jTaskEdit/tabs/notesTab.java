@@ -10,6 +10,8 @@ import jtaskui.Task.NoteObj;
 
 import javax.swing.SwingUtilities;
 
+import javax.swing.tree.TreePath;
+
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import javax.swing.JLabel;
@@ -45,6 +47,8 @@ public class notesTab implements notesListener {
         // Add the TreeTableModel to the Treetable
         notesTreeTable = new TreeTable(treeTableModel);
 
+        // TODO: This looks like a smell
+        notesTab t = this;
         // TODO: Should this be here ?
         notesTreeTable.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent me) {
@@ -57,6 +61,7 @@ public class notesTab implements notesListener {
                             // TODO: I need to listen for changes from this so the TreeTable can be updated on changes
                             // Open the notes editor window with the selected note
                             jNotesEdit jne = new jNotesEdit(getSelectedNote());
+                            jne.addListener(t);
                         }
                     });
                 }
@@ -103,29 +108,32 @@ public class notesTab implements notesListener {
 
     public void jteNoteActionsNewNote() {
         NoteObj newNote = new NoteObj("New Note");
-        task.addNote(newNote);
-        int[] newIndexs = new int[1];
-        newIndexs[0] = task.getSubNoteCount()-1;
-        // Inform the TreeTable nodes have been inserted
-        treeTableModel.nodesWereInserted(treeTableModel.getRoot(), newIndexs);
+        treeTableModel.insertNodeInto(newNote, task.getNoteRoot(), task.getNoteRoot().getChildCount());
         // Launch a new editor window
         jNotesEdit jne = new jNotesEdit(newNote);
+        jne.addListener(this);
     }
 
     public void jteNoteActionsNewSubNote() {
         NoteObj selectedTask = getSelectedNote();
         NoteObj newNote = new NoteObj("New Sub Note");
-        selectedTask.addNote(newNote);
-        int[] newIndexs = new int[1];
-        newIndexs[0] = selectedTask.getChildCount()-1;
-        // Inform the TreeTable nodes have been inserted
-        treeTableModel.nodesWereInserted(selectedTask, newIndexs);
+        treeTableModel.insertNodeInto(newNote, selectedTask, selectedTask.getChildCount());
         // Launch a new editor window
-        jNotesEdit jte = new jNotesEdit(newNote);
+        jNotesEdit jne = new jNotesEdit(newNote);
+        jne.addListener(this);
     }
 
     public void jteNoteActionsDeleteNote() {
         treeTableModel.removeNodeFromParent(getSelectedNote());
     }
 
+    public void jteNoteUpdateNoteTreeTable(TreePath path, String columnName) {
+        // TODO: This is required because NoteObj.getPath() doesnt include the ROOT object
+        TreePath p = new TreePath(treeTableModel.getRoot());
+        for(int i = 0; i < path.getPathCount(); i++) {
+            p = p.pathByAddingChild(path.getPathComponent(i));
+        }
+        // Notify the model of the relevant change
+        treeTableModel.valueForPathChanged(p, treeTableModel.findColumn(columnName));
+    }
 }
