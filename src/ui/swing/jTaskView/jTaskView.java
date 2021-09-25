@@ -141,11 +141,11 @@ public class jTaskView implements jtvListener {
         // Make sure all the chidlren have a expansion handles
         taskTreeTable.setShowsRootHandles(true);
 
-        // Set the columns sortable
-        taskTreeTable.setAutoCreateRowSorter(true);
-        // Get the RowSorter and set the custom comparator so we get proper sorting
-        TableRowSorter treeTableRowSorter = (TableRowSorter) taskTreeTable.getRowSorter();
-        // TODO: Need to fix the warning when setting this
+        // Create a TableRowSorter for our model
+        TableRowSorter<jTaskViewTreeTableModel> treeTableRowSorter = new TableRowSorter<jTaskViewTreeTableModel>(treeTableModel);
+        // Set this TableRowSorter on the TreeTable
+        taskTreeTable.setRowSorter(treeTableRowSorter);
+        // Set the comparator for the sorter to use
         treeTableRowSorter.setComparator(0, new TaskObjRowSorter(treeTableModel));
 
         // TODO: This feels like a smell! It's only here because I need to pass it to the anonymous below!
