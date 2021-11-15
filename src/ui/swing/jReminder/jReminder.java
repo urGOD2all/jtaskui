@@ -77,13 +77,12 @@ public class jReminder {
         row1.add(taskButton);
         // Put a 10 pixel fixed spacer between the Task Button and the last button
         row1.add(Box.createRigidArea(new Dimension(10, 0)));
-        // TODO: Fix this button, what is it/what does it do ?
         // TODO: This should be an icon only button
-        JButton unknownButton = new JButton("UKB");
+        JButton startEffortButton = new JButton("Start effort");
         // Set its minimum size
-        unknownButton.setMinimumSize(new Dimension(58, 24));
+        startEffortButton.setMinimumSize(new Dimension(58, 24));
         // Add the button to the row
-        row1.add(unknownButton);
+        row1.add(startEffortButton);
         // Glue the buttons in place by filling the rest of the row with Glue
         row1.add(Box.createHorizontalGlue());
 
