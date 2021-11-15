@@ -154,7 +154,7 @@ public class jTaskView implements jtvListener {
         taskTreeTable.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent me) {
                 // Detect double click events
-                if (me.getClickCount() == 2) {
+                if (me.getClickCount() == 2 && me.getButton() == MouseEvent.BUTTON1) {
                     // Invoke a thread for the edit frame
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
