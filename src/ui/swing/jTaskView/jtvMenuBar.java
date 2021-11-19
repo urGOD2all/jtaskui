@@ -7,6 +7,10 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
+import java.awt.event.KeyEvent;
+import javax.swing.KeyStroke;
+import java.awt.event.ActionEvent;
+
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -19,8 +23,8 @@ public class jtvMenuBar {
 
     // References stored global so text and enabled state can be changed
     private JMenuBar menuBar;
-    private JMenu file, view, viewColumns;
-    private JMenuItem fileOpen, fileSave, fileSaveAs, fileClose, fileQuit, viewColumnsCreationDate, viewColumnsModificationDate, viewColumnsDescription;
+    private JMenu file, edit, view, viewColumns;
+    private JMenuItem fileOpen, fileSave, fileSaveAs, fileClose, fileQuit, editTask, deleteTask, viewColumnsCreationDate, viewColumnsModificationDate, viewColumnsDescription;
 
     /**
      * Initialises the JMenuBar and calls methods to create all the items
@@ -28,6 +32,7 @@ public class jtvMenuBar {
     public jtvMenuBar() {
         menuBar = new JMenuBar();
         buildFileMenus();
+        buildEditMenus();
         buildViewMenus();
     }
 
@@ -132,6 +137,25 @@ public class jtvMenuBar {
         for (jtvListener aListener : listeners) aListener.jtvMenuBarFileQuit();
     }
 
+    /*
+     * Edit menu
+     */
+
+    private void buildEditMenus() {
+        edit = new JMenu("Edit");
+        editTask = new JMenuItem("Edit");
+        editTask.addActionListener(e -> { for (jtvListener aListener : listeners) aListener.jtvTaskActionsEditTask(); } );
+        editTask.setMnemonic(KeyEvent.VK_E);
+        editTask.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
+        deleteTask = new JMenuItem("Delete");
+
+        edit.addSeparator();
+        edit.add(editTask);
+        edit.add(deleteTask);
+        edit.addSeparator();
+
+        menuBar.add(edit);
+    }
     /*
      * View menu
      */

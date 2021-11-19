@@ -20,16 +20,21 @@ import jtaskui.scheduler.scheduleHandler;
 import javax.swing.SwingUtilities;
 
 import java.awt.Component;
+import javax.swing.JComponent;
 import javax.swing.table.TableCellRenderer;
 import java.awt.Color;
 import javax.swing.JFrame;
 import java.awt.BorderLayout;
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
+import java.awt.event.KeyEvent;
+import javax.swing.KeyStroke;
 
 import javax.swing.border.BevelBorder;
 import java.awt.Dimension;
+import java.awt.Point;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -67,6 +72,8 @@ public class jTaskView implements jtvListener {
     private TaskObj root;
     // The scheduler, responsible for scheduling operations for reminders
     private scheduleHandler scheduleHandler;
+    // Stores a reference to the TaskObj that has been cut or copied, ready for pasting
+    private TaskObj taskCutCopy;
 
     /*
      * Constructors
@@ -124,6 +131,7 @@ public class jTaskView implements jtvListener {
             public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
                 // First, call the TreeTable to prepare the renderer
                 Component c = super.prepareRenderer(renderer, row, column);
+                JComponent jc = (JComponent) c;
                 // Get the node for this row from the model using view indexes incase of sorting
                 TaskObj rowData = (TaskObj) getModel().nodeForRow(convertRowIndexToModel(row));
                 // TODO: Need to have overdue items in red and due today in orange
@@ -131,7 +139,9 @@ public class jTaskView implements jtvListener {
                 if (rowData.isComplete()) c.setForeground(Color.GREEN);
                 else if (rowData.isStarted()) c.setForeground(Color.BLUE);
                 else c.setForeground(Color.GRAY);
-
+                // TODO: The expandable column doesnt get the border, need to figure this out. It will be a TreeTable problem not here.
+                // Set the copy border
+                if(rowData == taskCutCopy) jc.setBorder(BorderFactory.createDashedBorder(Color.DARK_GRAY));
                 // Return the modified component
                 return c;
             }
@@ -155,18 +165,22 @@ public class jTaskView implements jtvListener {
             public void mouseClicked(MouseEvent me) {
                 // Detect double click events
                 if (me.getClickCount() == 2 && me.getButton() == MouseEvent.BUTTON1) {
-                    // Invoke a thread for the edit frame
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            jTaskEdit jte = new jTaskEdit(getSelectedTask());
-                            jte.addListener(jtui);
-                            jte.initGUI();
-                        }
-                    });
+                    // Call the edit UI
+                    jtvTaskActionsEditTask();
                 }
             }
         });
+
+        // Remove the TreeTable action on pressing the enter key. This will be handled by the menu accelerator
+        KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+        taskTreeTable.getInputMap(TreeTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(enter, "Edit");
+
+        // Create the popup menu for the Task TreeTable
+        jTaskViewTreeTableRC popupMenu = new jTaskViewTreeTableRC();
+        // Listen for events from the menu here
+        popupMenu.addListener(this);
+        // Set the popupMenu on the TreeTable
+        taskTreeTable.setComponentPopupMenu(popupMenu.getPopupMenu());
 
         // Add the TreeTable to the scroll pane
         JScrollPane rootScrollpane = new JScrollPane(taskTreeTable);
@@ -380,10 +394,34 @@ public class jTaskView implements jtvListener {
     }
 
     /**
-     * This is invoked when the Delete Task button is clicked
+     * This is invoked when a task is edited (enter is pressed, right click edit is used, edit menu item is used)
+     */
+    public void jtvTaskActionsEditTask() {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                jTaskEdit jte = new jTaskEdit(getSelectedTask());
+                jte.addListener(jTaskView.this);
+                jte.initGUI();
+            }
+        });
+    }
+
+
+    /**
+     * This is invoked on the currently selected row when the Delete Task button is clicked
      */
     public void jtvTaskActionsDeleteTask() {
-        getModel().removeNodeFromParent(getSelectedTask());
+        jtvTaskActionsDeleteTask(getSelectedTask());
+    }
+
+    /**
+     * Deletes the task in the parameter from its parent.
+     *
+     * @param task - TaskObj to remove
+     */
+    public void jtvTaskActionsDeleteTask(TaskObj task) {
+        getModel().removeNodeFromParent(task);
     }
 
     /**
@@ -399,6 +437,42 @@ public class jTaskView implements jtvListener {
     }
 
     /**
+     * Takes a reference to the TaskObj being cut and removes it immediately from the TreeTable
+     */
+    public void jtvTaskActionsCutTask() {
+        taskCutCopy = getSelectedTask();
+        jtvTaskActionsDeleteTask(taskCutCopy);
+    }
+
+    /**
+     * STUB
+     * Performs a deep copy of the TaskObj on the selected row ready for paste action
+     * STUB
+     */
+    public void jtvTaskActionsCopyTask() {
+        //taskCutCopy = getSelectedTask();
+        // TODO: I am going to need to implement a deep copy in TaskObj to get this working.
+        System.err.println("Feature not implemented");
+    }
+
+    /**
+     * Inserts the TaskObj referenced during a cut or copy operation into the ROOT of the TreeTable
+     */
+    public void jtvTaskActionsPasteTask() {
+        if (taskCutCopy != null) getModel().insertNodeInto(taskCutCopy, getModel().getRoot(), getModel().getRoot().getChildCount());
+        taskCutCopy = null;
+    }
+
+    /**
+     * Inserts the TaskObj referenced during a cur or copy operation as a SubTask of the Task on the selected row.
+     */
+    public void jtvTaskActionsPasteAsSubTask() {
+        TaskObj selectedTask = getSelectedTask();
+        if (taskCutCopy != null) getModel().insertNodeInto(taskCutCopy, selectedTask, selectedTask.getChildCount());
+        taskCutCopy = null;
+    }
+
+    /**
      * This is invoked when something external causes a change to the data that
      * requires the Task TreeTable be updated
      */
@@ -411,6 +485,19 @@ public class jTaskView implements jtvListener {
         //System.out.println(p + " " + columnName + " " + getModel().findColumn(columnName));
         // Notify the model of the relevant change
         getModel().valueForPathChanged(p, getModel().findColumn(columnName));
+    }
+
+    /**
+     * Gets the row under the pointer and selects it in the TreeTable
+     */
+    public void jtvSelectRowAtPoint(Component source) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                int rowAtPoint = getTaskTable().rowAtPoint(SwingUtilities.convertPoint(source, new Point(0, 0), getTaskTable()));
+                if (rowAtPoint >= 0) getTaskTable().setRowSelectionInterval(rowAtPoint, rowAtPoint);
+             }
+        });
     }
 
     private int getSelectedRow() {
