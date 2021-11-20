@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
@@ -47,7 +48,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
     private TaskObj parent;
 
     // Used to store the full path of the task heirachy
-    TreePath fullPath;
+    private TreePath fullPath;
 
 
     // Store the number of all subtasks in the children
@@ -942,6 +943,31 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         // Check to see if the task is started but not complete, tasks can have a complete and start date
         if(hasActualStartDate() && !isComplete()) return true;
         else return false;
+    }
+
+    /**
+     * Checks if the current Date is after the confgured Due Date
+     *
+     * @returns boolean - true if the task is overdue (current date is after the configured due date), false otherwise.
+     */
+    public boolean isOverdue() {
+        // If this Task has a due date, return true if now is after the Due date
+        if(hasDueDate()) return LocalDateTime.now().isAfter(getDueDate());
+        return false;
+    }
+
+    /**
+     * Checks if the configured Due Date for this task is within 24 hours of the current date.
+     *
+     * @return boolean - true if task is within 24 hours of current time, otherwise false
+     */
+    public boolean isDue() {
+        if(hasDueDate()) {
+            // TODO: This needs to read a configurable value for the amount of time to consider something to be due. ATM this is 24hours
+            long secondsDiff = ChronoUnit.SECONDS.between(LocalDateTime.now(), getDueDate());
+            if(secondsDiff > 0 && secondsDiff < 86400) return true;
+        }
+        return false;
     }
 
     public int getUnsupportedAttributeCount() {

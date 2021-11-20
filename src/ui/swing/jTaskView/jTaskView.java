@@ -138,6 +138,8 @@ public class jTaskView implements jtvListener {
                 // Depending on the state of the task, change the text color
                 if (rowData.isComplete()) c.setForeground(Color.GREEN);
                 else if (rowData.isStarted()) c.setForeground(Color.BLUE);
+                else if (rowData.isDue()) c.setForeground(Color.ORANGE);
+                else if (rowData.isOverdue()) c.setForeground(Color.RED);
                 else c.setForeground(Color.GRAY);
                 // TODO: The expandable column doesnt get the border, need to figure this out. It will be a TreeTable problem not here.
                 // Set the copy border
