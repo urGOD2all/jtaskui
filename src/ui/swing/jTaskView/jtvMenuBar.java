@@ -1,5 +1,7 @@
 package jtaskui.ui.swing.jTaskView;
 
+import jtaskui.ui.swing.factory.JMenuItemFactory;
+
 import java.util.List;
 import java.util.ArrayList;
 
@@ -145,17 +147,10 @@ public class jtvMenuBar {
 
     private void buildEditMenus() {
         edit = new JMenu("Edit");
-        editTask = new JMenuItem("Edit");
-        editTask.addActionListener(e -> { for (jtvListener aListener : listeners) aListener.jtvTaskActionsEditTask(); } );
-        editTask.setMnemonic(KeyEvent.VK_E);
-        editTask.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
-        deleteTask = new JMenuItem("Delete");
-
         edit.addSeparator();
-        edit.add(editTask);
-        edit.add(deleteTask);
+        edit.add(JMenuItemFactory.configureMenuItem("Edit", KeyEvent.VK_E, KeyEvent.VK_ENTER, 0, e-> { for (jtvListener aListener : listeners) aListener.jtvTaskActionsEditTask(); }, 200 ));
+        edit.add(JMenuItemFactory.configureMenuItem("Delete", KeyEvent.VK_D, KeyEvent.VK_DELETE, InputEvent.CTRL_DOWN_MASK, e-> { for (jtvListener aListener : listeners) aListener.jtvTaskActionsDeleteTask(); }));
         edit.addSeparator();
-
         menuBar.add(edit);
     }
     /*
@@ -183,18 +178,9 @@ public class jtvMenuBar {
 
     private void buildNewMenus() {
         newMenu = new JMenu("New");
-        JMenuItem newMenuNewTask = new JMenuItem("New Task");
-        newMenuNewTask.addActionListener(e -> { for (jtvListener aListener : listeners) aListener.jtvTaskActionsNewTask(); } );
-        newMenuNewTask.setMnemonic(KeyEvent.VK_N);
-        newMenuNewTask.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0));
-        JMenuItem newMenuNewSubTask = new JMenuItem("New SubTask");
-        newMenuNewSubTask.addActionListener(e -> { for (jtvListener aListener : listeners) aListener.jtvTaskActionsNewSubTask(); } );
-        newMenuNewSubTask.setMnemonic(KeyEvent.VK_S);
-        newMenuNewSubTask.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
-
-        newMenu.add(newMenuNewTask);
+        newMenu.add(JMenuItemFactory.configureMenuItem("New Task", KeyEvent.VK_N, KeyEvent.VK_INSERT, 0, e-> { for (jtvListener aListener : listeners) aListener.jtvTaskActionsNewTask(); }, 200 ));
         newMenu.addSeparator();
-        newMenu.add(newMenuNewSubTask);
+        newMenu.add(JMenuItemFactory.configureMenuItem("New SubTask", KeyEvent.VK_S, KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK, e-> { for (jtvListener aListener : listeners) aListener.jtvTaskActionsNewSubTask(); } ));
 
         menuBar.add(newMenu);
     }
