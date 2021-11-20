@@ -21,6 +21,10 @@ import javax.swing.JButton;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.AbstractAction;
+
+import javax.swing.KeyStroke;
+import java.awt.event.KeyEvent;
 
 public class jTaskEdit implements ActionListener {
     // Listeners to be notified when actions are performed
@@ -69,6 +73,15 @@ public class jTaskEdit implements ActionListener {
         // Create the close button and add to SOUTH EAST
         closeEditFrame = new JButton("Close");
         closeEditFrame.addActionListener(this);
+        // Set the escape key to close the frame
+        KeyStroke escape = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+        closeEditFrame.getInputMap(JButton.WHEN_IN_FOCUSED_WINDOW).put(escape, "ClosejTaskEdit");
+        closeEditFrame.getActionMap().put("ClosejTaskEdit", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                editFrame.dispose();
+            }
+        });
         efSouthEast.add(closeEditFrame, BorderLayout.EAST);
 
         // Build each tab
