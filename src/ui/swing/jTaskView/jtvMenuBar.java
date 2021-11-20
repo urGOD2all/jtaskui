@@ -10,6 +10,7 @@ import javax.swing.JMenuItem;
 import java.awt.event.KeyEvent;
 import javax.swing.KeyStroke;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -23,7 +24,7 @@ public class jtvMenuBar {
 
     // References stored global so text and enabled state can be changed
     private JMenuBar menuBar;
-    private JMenu file, edit, view, viewColumns;
+    private JMenu file, edit, view, viewColumns, newMenu;
     private JMenuItem fileOpen, fileSave, fileSaveAs, fileClose, fileQuit, editTask, deleteTask, viewColumnsCreationDate, viewColumnsModificationDate, viewColumnsDescription;
 
     /**
@@ -34,6 +35,7 @@ public class jtvMenuBar {
         buildFileMenus();
         buildEditMenus();
         buildViewMenus();
+        buildNewMenus();
     }
 
     /**
@@ -177,5 +179,23 @@ public class jtvMenuBar {
         viewColumns.add(viewColumnsDescription);
 
         menuBar.add(view);
+    }
+
+    private void buildNewMenus() {
+        newMenu = new JMenu("New");
+        JMenuItem newMenuNewTask = new JMenuItem("New Task");
+        newMenuNewTask.addActionListener(e -> { for (jtvListener aListener : listeners) aListener.jtvTaskActionsNewTask(); } );
+        newMenuNewTask.setMnemonic(KeyEvent.VK_N);
+        newMenuNewTask.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0));
+        JMenuItem newMenuNewSubTask = new JMenuItem("New SubTask");
+        newMenuNewSubTask.addActionListener(e -> { for (jtvListener aListener : listeners) aListener.jtvTaskActionsNewSubTask(); } );
+        newMenuNewSubTask.setMnemonic(KeyEvent.VK_S);
+        newMenuNewSubTask.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+
+        newMenu.add(newMenuNewTask);
+        newMenu.addSeparator();
+        newMenu.add(newMenuNewSubTask);
+
+        menuBar.add(newMenu);
     }
 }
