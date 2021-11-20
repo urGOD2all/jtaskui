@@ -1,5 +1,7 @@
 package jtaskui.ui.swing.jTaskView;
 
+import jtaskui.ui.swing.factory.JMenuItemFactory;
+
 import javax.swing.JPopupMenu;
 import javax.swing.JMenuItem;
 
@@ -52,43 +54,16 @@ public class jTaskViewTreeTableRC {
 
     private void build() {
         // Add and built all the items to the menu
-        popupMenu.add(configureMenuItem("Cut", KeyEvent.VK_T, KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK, e->cutAction()));
-        popupMenu.add(configureMenuItem("Copy", KeyEvent.VK_C, KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, e->copyAction()));
-        pasteTaskItem = configureMenuItem("Paste", KeyEvent.VK_P, KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK, e->pasteTaskAction(), false);
-        pasteSubTaskItem = configureMenuItem("Paste as sub-task", KeyEvent.VK_A, KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK, e->pasteAsSubTaskAction(), false);
+        popupMenu.add(JMenuItemFactory.configureMenuItem("Cut", KeyEvent.VK_T, KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK, e->cutAction()));
+        popupMenu.add(JMenuItemFactory.configureMenuItem("Copy", KeyEvent.VK_C, KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, e->copyAction()));
+        pasteTaskItem = JMenuItemFactory.configureMenuItem("Paste", KeyEvent.VK_P, KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK, e->pasteTaskAction(), false);
+        pasteSubTaskItem = JMenuItemFactory.configureMenuItem("Paste as sub-task", KeyEvent.VK_A, KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK, e->pasteAsSubTaskAction(), false);
         popupMenu.add(pasteTaskItem);
         popupMenu.add(pasteSubTaskItem);
         popupMenu.addSeparator();
-        popupMenu.add(configureMenuItem("Edit", KeyEvent.VK_E, KeyEvent.VK_ENTER, 0, e->{ for (jtvListener aListener : listeners) aListener.jtvTaskActionsEditTask(); }, 300));
-        popupMenu.add(configureMenuItem("Delete", KeyEvent.VK_D, KeyEvent.VK_DELETE, InputEvent.CTRL_DOWN_MASK, e->{ for (jtvListener aListener : listeners) aListener.jtvTaskActionsDeleteTask(); }));
+        popupMenu.add(JMenuItemFactory.configureMenuItem("Edit", KeyEvent.VK_E, KeyEvent.VK_ENTER, 0, e->{ for (jtvListener aListener : listeners) aListener.jtvTaskActionsEditTask(); }, 300));
+        popupMenu.add(JMenuItemFactory.configureMenuItem("Delete", KeyEvent.VK_D, KeyEvent.VK_DELETE, InputEvent.CTRL_DOWN_MASK, e->{ for (jtvListener aListener : listeners) aListener.jtvTaskActionsDeleteTask(); }));
         popupMenu.addSeparator();
-    }
-
-    // TODO: need to add icon support
-    private JMenuItem configureMenuItem(String title, int mnemonic, int accKeyCode, int accModifiers, ActionListener action, int width) {
-        JMenuItem item = configureMenuItem(title, mnemonic, accKeyCode, accModifiers, action);
-
-        item.setPreferredSize(new Dimension(width, item.getPreferredSize().height));
-
-        return item;
-    }
-
-    private JMenuItem configureMenuItem(String title, int mnemonic, int accKeyCode, int accModifiers, ActionListener action, boolean initialState) {
-        JMenuItem item = configureMenuItem(title, mnemonic, accKeyCode, accModifiers, action);
-
-        item.setEnabled(initialState);
-
-        return item;
-    }
-
-    private JMenuItem configureMenuItem(String title, int mnemonic, int accKeyCode, int accModifiers, ActionListener action) {
-        JMenuItem item = new JMenuItem(title);
-
-        item.setMnemonic(mnemonic);
-        item.setAccelerator(KeyStroke.getKeyStroke(accKeyCode, accModifiers));
-        item.addActionListener(action);
-
-        return item;
     }
 
     private void cutAction() {
