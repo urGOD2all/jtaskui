@@ -633,6 +633,15 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
     }
 
     /**
+     * Returns a correctly formatted Reminder date/time in a LocalDateTime object
+     *
+     * @return LocalDateTime - Task reminder date
+     */
+    public LocalDateTime getCreationLocalDateTime() {
+        return parseDateTime(getCreationDateTime(), TaskObj.CREATION_DATE_FORMATTER);
+    }
+
+    /**
      * Returns the percentage completion of this TaskObj
      *
      * @return int - percentage of TaskObj completion.
