@@ -410,7 +410,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
      *
      * @return String - value of the attribute requested or null if the attribute is not set
      */
-    public String getAttribute(String name) {
+    private String getAttribute(String name) {
         return attributes.get(name);
     }
 
@@ -503,7 +503,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
      *
      * @return String - the raw creation date and time attribute from the datasource
      */
-    public String getCreationDateTime() {
+    private String getCreationDateTime() {
         return getAttribute("creationDateTime");
     }
 
@@ -513,7 +513,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
      *
      * @return String - the raw modification date and time attribute from the datasource
      */
-    public String getModificationDateTime() {
+    private String getModificationDateTime() {
         return getAttribute("modificationDateTime");
     }
 

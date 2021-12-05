@@ -1,6 +1,7 @@
 package jtaskui.TreeTableModels;
 
 import jtaskui.Task.NoteObj;
+import jtaskui.util.DateUtil;
 
 import TreeTable.AbstractTreeTableModel;
 import TreeTable.TreeTableModel;
@@ -178,9 +179,10 @@ public class notesTabTreeTableModel extends AbstractTreeTableModel {
                 // TODO: Fix attachments
                 return "Currently not supported";
             case "Creation Date":
-                return note.getCreationDateTime();
+                return DateUtil.formatToString(note.getCreationLocalDateTime(), DateUtil.DISPLAY_FORMATTER, true);
             case "Modification Date":
-                return note.getModificationDateTime();
+                if (note.hasModificationDate()) return DateUtil.formatToString(note.getModificationLocalDateTime(), DateUtil.DISPLAY_FORMATTER, true);
+                else return "N/A";
             default:
                 return "ERROR: Failed to getValueAt " + columnIndex + " for " + colName;
         }
