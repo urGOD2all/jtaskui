@@ -2,6 +2,7 @@ package jtaskui.ui.swing.jNotesEdit.tabs;
 
 import jtaskui.Task.NoteObj;
 import jtaskui.ui.swing.jTaskEdit.tabs.notesListener;
+import jtaskui.util.DateUtil;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -62,10 +63,12 @@ public class descTab implements FocusListener {
 
         // Creation date
         JLabel creationDateLabel = new JLabel("Creation Date");
-        JLabel creationDate = new JLabel(note.getFormattedCreationDateTime());
+        JLabel creationDate = new JLabel(DateUtil.formatToString(note.getCreationLocalDateTime(), DateUtil.DISPLAY_FORMATTER, false));
         // Modification date
         JLabel modificationDateLabel = new JLabel("Modification Date");
-        modificationDate = new JLabel(note.getFormattedModificationDateTime());
+        if(note.hasModificationDate()) modificationDate = new JLabel(DateUtil.formatToString(note.getModificationLocalDateTime(), DateUtil.DISPLAY_FORMATTER, false));
+        else modificationDate = new JLabel("N/A");
+
 
         // Add the labels and the data to the correct locations
         westPanel.add(subjectLabel, BorderLayout.NORTH);
@@ -120,7 +123,7 @@ public class descTab implements FocusListener {
         // Update the Notes TreeTable on the jTaskEdit notesTab
         for (notesListener aListener : listeners) aListener.jteNoteUpdateNoteTreeTable(note.getPath(), "Modification Date");
         // Update the modification date label on the panel to the one stored in the NoteObj
-        modificationDate.setText(note.getFormattedModificationDateTime());
+        modificationDate.setText(DateUtil.formatToString(note.getModificationLocalDateTime(), DateUtil.DISPLAY_FORMATTER, false));
     }
 
     /**

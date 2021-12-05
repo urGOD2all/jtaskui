@@ -2,6 +2,7 @@ package jtaskui.ui.swing.jTaskEdit.tabs;
 
 import jtaskui.TaskObj;
 import jtaskui.ui.swing.jTaskView.jtvListener;
+import jtaskui.util.DateUtil;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -77,10 +78,11 @@ public class descTab implements FocusListener {
 
         // Creation date
         JLabel creationDateLabel = new JLabel("Creation Date");
-        JLabel creationDate = new JLabel(task.getFormattedCreationDateTime());
+        JLabel creationDate = new JLabel(DateUtil.formatToString(task.getCreationLocalDateTime(), DateUtil.DISPLAY_FORMATTER, false));
         // Modification date
         JLabel modificationDateLabel = new JLabel("Modification Date");
-        modificationDate = new JLabel(task.getFormattedModificationDateTime());
+        if(task.hasModificationDate()) modificationDate = new JLabel(DateUtil.formatToString(task.getModificationLocalDateTime(), DateUtil.DISPLAY_FORMATTER, false));
+        else modificationDate = new JLabel("N/A");
 
         // Add the labels and the data to the correct locations
         westPanel.add(subjectLabel, BorderLayout.NORTH);
@@ -128,7 +130,7 @@ public class descTab implements FocusListener {
             task.updateModificationDateTime();
             for (jtvListener aListener : listeners) aListener.jtvUpdateTaskTreeTable(task.getPath(), "Description");
         }
-        modificationDate.setText(task.getFormattedModificationDateTime());
+        modificationDate.setText(DateUtil.formatToString(task.getModificationLocalDateTime(), DateUtil.DISPLAY_FORMATTER, false));
         for (jtvListener aListener : listeners) aListener.jtvUpdateTaskTreeTable(task.getPath(), "Modification Date");
     }
 

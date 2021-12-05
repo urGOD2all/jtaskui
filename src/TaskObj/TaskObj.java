@@ -449,53 +449,9 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         return getAttribute("priority");
     }
 
-    // TODO: Remove this method and favour LocalDateTime format
-    /**
-     * Helper to handle parsing dates and times to String output format
-     *
-     * Note: If parsing fails an error will be emitted to standard error and the date and time now will be returned instead.
-     *
-     * @param dateTime - String representation of the date and time to parse
-     * @return String - dateTime parsed to the display format "yyyy-MM-dd HH:mm" or "N/A" when input is null
-     */
-    private String getFormattedDateTime(String dateTime) {
-        try {
-            return LocalDateTime.parse(dateTime, readInDateFormat).format(dateDisplayFormat);
-        }
-        catch(NullPointerException npe) {
-            // This attribute is absent so return N/A which is what formatted field dates look like when they are absent
-            return "N/A";
-        }
-        catch(DateTimeParseException dtpe) {
-        // TODO: Make errors like this come up either in a console or as an error message
-            System.err.println("Error parsing datetime for " + dateTime + " in " + dateDisplayFormatString + " format");
-            return "N/A";
-        }
-    }
-
     /*
      * Internal getters for raw Dates and Times
      */
-
-    // TODO: Remove this method in favour of the LocalDateTimeVersions
-    /**
-     * Returns a String representation of the creationDateTime attribute in the display format.
-     *
-     * @return String - Formatted Date and Time
-     */
-    public String getFormattedCreationDateTime() {
-        return getFormattedDateTime(getCreationDateTime());
-    }
-
-    // TODO: Remove this method in favour of the LocalDateTimeVersions
-    /**
-     * Returns a String representation of the modificationDateTime attribute in the display format.
-     *
-     * @return String - Formatted Date and Time
-     */
-    public String getFormattedModificationDateTime() {
-        return getFormattedDateTime(getModificationDateTime());
-    }
 
     /**
      * Returns a String representation of the creationDateTime attribute. This is the raw value from the datasource.
