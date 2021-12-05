@@ -1,5 +1,7 @@
 package jtaskui;
 
+import jtaskui.util.DateUtil;
+
 import jtaskui.Task.NoteObj;
 
 import jtaskui.scheduler.scheduleHandler;
@@ -64,26 +66,22 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
     private static final String dateDisplayFormatString = "yyyy-MM-dd HH:mm";
 
     // Fields for Date and Time formats
-    private static final String HIGH_PRECISION_FORMAT  = "yyyy-MM-dd HH:mm:ss.SSSSSS";
-    private static final String LOW_PRECISION_FORMAT   = "yyyy-MM-dd HH:mm:ss";
-    public static final String DUE_DATE_FORMAT         = LOW_PRECISION_FORMAT;
-    public static final String REMINDER_DATE_FORMAT    = LOW_PRECISION_FORMAT;
-    public static final String PLANNED_DATE_FORMAT     = LOW_PRECISION_FORMAT;
-    public static final String CREATION_DATE_FORMAT    = HIGH_PRECISION_FORMAT;
-    public static final String MODIFICTION_DATE_FORMAT = HIGH_PRECISION_FORMAT;
-    public static final String COMPLETION_DATE_FORMAT  = HIGH_PRECISION_FORMAT;
-    public static final String ACTUAL_DATE_FORMAT      = HIGH_PRECISION_FORMAT;
+    public static final String DUE_DATE_FORMAT          = DateUtil.LOW_PRECISION_FORMAT;
+    public static final String REMINDER_DATE_FORMAT     = DateUtil.LOW_PRECISION_FORMAT;
+    public static final String PLANNED_DATE_FORMAT      = DateUtil.LOW_PRECISION_FORMAT;
+    public static final String CREATION_DATE_FORMAT     = DateUtil.HIGH_PRECISION_FORMAT;
+    public static final String MODIFICATION_DATE_FORMAT = DateUtil.HIGH_PRECISION_FORMAT;
+    public static final String COMPLETION_DATE_FORMAT   = DateUtil.HIGH_PRECISION_FORMAT;
+    public static final String ACTUAL_DATE_FORMAT       = DateUtil.HIGH_PRECISION_FORMAT;
 
     // Fields for Date and Time Formatters
-    private static final DateTimeFormatter HIGH_PRECISION_FORMATTER  = DateTimeFormatter.ofPattern(HIGH_PRECISION_FORMAT);
-    private static final DateTimeFormatter LOW_PRECISION_FORMATTER   = DateTimeFormatter.ofPattern(LOW_PRECISION_FORMAT);
-    public static final DateTimeFormatter DUE_DATE_FORMATTER         = LOW_PRECISION_FORMATTER;
-    public static final DateTimeFormatter PLANNED_DATE_FORMATTER     = LOW_PRECISION_FORMATTER;
-    public static final DateTimeFormatter REMINDER_DATE_FORMATTER    = LOW_PRECISION_FORMATTER;
-    public static final DateTimeFormatter CREATION_DATE_FORMATTER    = HIGH_PRECISION_FORMATTER;
-    public static final DateTimeFormatter MODIFICTION_DATE_FORMATTER = HIGH_PRECISION_FORMATTER;
-    public static final DateTimeFormatter COMPLETION_DATE_FORMATTER  = HIGH_PRECISION_FORMATTER;
-    public static final DateTimeFormatter ACTUAL_DATE_FORMATTER      = HIGH_PRECISION_FORMATTER;
+    public static final DateTimeFormatter DUE_DATE_FORMATTER          = DateUtil.LOW_PRECISION_FORMATTER;
+    public static final DateTimeFormatter PLANNED_DATE_FORMATTER      = DateUtil.LOW_PRECISION_FORMATTER;
+    public static final DateTimeFormatter REMINDER_DATE_FORMATTER     = DateUtil.LOW_PRECISION_FORMATTER;
+    public static final DateTimeFormatter CREATION_DATE_FORMATTER     = DateUtil.HIGH_PRECISION_FORMATTER;
+    public static final DateTimeFormatter MODIFICATION_DATE_FORMATTER = DateUtil.HIGH_PRECISION_FORMATTER;
+    public static final DateTimeFormatter COMPLETION_DATE_FORMATTER   = DateUtil.HIGH_PRECISION_FORMATTER;
+    public static final DateTimeFormatter ACTUAL_DATE_FORMATTER       = DateUtil.HIGH_PRECISION_FORMATTER;
 
     /*
      * Constructors
@@ -238,7 +236,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
      */
     // TODO; I would like this to be managed by this object, for now, the UI will have to call it
     public void updateModificationDateTime() {
-        setModificationDateTime(LocalDateTime.now().format(TaskObj.MODIFICTION_DATE_FORMATTER));
+        setModificationDateTime(LocalDateTime.now().format(TaskObj.MODIFICATION_DATE_FORMATTER));
     }
 
     private void setDueDateTime(String value) {
@@ -451,27 +449,6 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         return getAttribute("priority");
     }
 
-    /**
-     * Helper to handle parsing of dates and times to LocalDateTime objects
-     *
-     * Note: If parsing fails an error will be emitted to standard error and the date and time now will be returned instead.
-     *
-     * @param dateTime - String representation of the date and time to parse
-     * @param inFormat - DateTimeFormatter in the format of dateTime
-     * @return LocalDateTime - parsed to the TaskCoach format "yyyy-MM-dd HH:mm:ss.nnnnnn"
-     */
-    private LocalDateTime parseDateTime(String dateTime, DateTimeFormatter inFormat) {
-        try {
-            if(dateTime == null) return LocalDateTime.now();
-            return LocalDateTime.parse(dateTime, inFormat);
-        }
-        catch (DateTimeParseException e) {
-            System.err.println(getSubject());
-            System.err.println("ERROR: Failed to parse " + dateTime + " - Expected format " + inFormat);
-            return LocalDateTime.now();
-        }
-    }
-
     // TODO: Remove this method and favour LocalDateTime format
     /**
      * Helper to handle parsing dates and times to String output format
@@ -593,7 +570,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
      * @return LocalDateTime - Task due date
      */
     public LocalDateTime getDueDate() {
-        return parseDateTime(getDueDateTime(), TaskObj.DUE_DATE_FORMATTER);
+        return DateUtil.parseDateTime(getDueDateTime(), TaskObj.DUE_DATE_FORMATTER, getSubject() + " Due Date");
     }
 
     /**
@@ -602,7 +579,16 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
      * @return LocalDateTime - Task completion date
      */
     public LocalDateTime getCompletionLocalDateTime() {
-        return parseDateTime(getCompletionDateTime(), COMPLETION_DATE_FORMATTER);
+        return DateUtil.parseDateTime(getCompletionDateTime(), COMPLETION_DATE_FORMATTER, getSubject() + " Completion Date");
+    }
+
+    /**
+     * Returns a correctly formatted Modification date in a LocalDateTime object
+     *
+     * @return LocalDateTime - Task modification date
+     */
+    public LocalDateTime getModificationLocalDateTime() {
+        return DateUtil.parseDateTime(getModificationDateTime(), MODIFICATION_DATE_FORMATTER, getSubject() + " Modification Date");
     }
 
     /**
@@ -611,7 +597,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
      * @return LocalDateTime - Task planned start date
      */
     public LocalDateTime getPlannedStartLocalDateTime() {
-        return parseDateTime(getPlannedStartDateTime(), TaskObj.PLANNED_DATE_FORMATTER);
+        return DateUtil.parseDateTime(getPlannedStartDateTime(), TaskObj.PLANNED_DATE_FORMATTER, getSubject() + " Planned Start Date");
     }
 
     /**
@@ -620,7 +606,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
      * @return LocalDateTime - Task actual start date
      */
     public LocalDateTime getActualStartLocalDateTime() {
-        return parseDateTime(getActualStartDateTime(), TaskObj.ACTUAL_DATE_FORMATTER);
+        return DateUtil.parseDateTime(getActualStartDateTime(), TaskObj.ACTUAL_DATE_FORMATTER, getSubject() + " Actual Start Date");
     }
 
     /**
@@ -629,7 +615,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
      * @return LocalDateTime - Task reminder date
      */
     public LocalDateTime getReminderLocalDateTime() {
-        return parseDateTime(getReminderDateTime(), TaskObj.REMINDER_DATE_FORMATTER);
+        return DateUtil.parseDateTime(getReminderDateTime(), TaskObj.REMINDER_DATE_FORMATTER, getSubject() + " Reminder Date");
     }
 
     /**
@@ -638,7 +624,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
      * @return LocalDateTime - Task reminder date
      */
     public LocalDateTime getCreationLocalDateTime() {
-        return parseDateTime(getCreationDateTime(), TaskObj.CREATION_DATE_FORMATTER);
+        return DateUtil.parseDateTime(getCreationDateTime(), TaskObj.CREATION_DATE_FORMATTER, getSubject() + " Creation Date");
     }
 
     /**
@@ -906,6 +892,11 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
     public boolean hasDescription() {
         if (getDescription() == "") return false;
         return true;
+    }
+
+    public boolean hasModificationDate() {
+        if (hasAttribute("modificationDateTime")) return true;
+        return false;
     }
 
     public boolean hasPlannedStartDate() {

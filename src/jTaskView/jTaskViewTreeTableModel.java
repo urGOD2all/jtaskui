@@ -1,6 +1,7 @@
 package jtaskui.view;
 
 import jtaskui.TaskObj;
+import jtaskui.util.DateUtil;
 
 import TreeTable.AbstractTreeTableModel;
 import TreeTable.TreeTableModel;
@@ -92,9 +93,10 @@ public class jTaskViewTreeTableModel extends AbstractTreeTableModel {
             case "Description":
                 return task.getDescription();
             case "Creation Date":
-                return task.getCreationDateTime();
+                return DateUtil.formatToString(task.getCreationLocalDateTime(), DateUtil.DISPLAY_FORMATTER, true);
             case "Modification Date":
-                return task.getModificationDateTime();
+                if (task.hasModificationDate()) return DateUtil.formatToString(task.getModificationLocalDateTime(), DateUtil.DISPLAY_FORMATTER, true);
+                else return "N/A";
             default:
                 return "ERROR: Failed to getValueAt " + columnIndex;
         }
