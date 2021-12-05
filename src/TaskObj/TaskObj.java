@@ -497,7 +497,6 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         return getFormattedDateTime(getModificationDateTime());
     }
 
-    // TODO: Untangle this method from the rest of the code, make it private
     /**
      * Returns a String representation of the creationDateTime attribute. This is the raw value from the datasource.
      *
@@ -507,7 +506,6 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         return getAttribute("creationDateTime");
     }
 
-    // TODO: Untangle this method from the rest of the code, make it private
     /**
      * Returns a String representation of the modificationDateTime attribute. This is the raw value from the datasource.
      *
@@ -984,7 +982,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         return this.getSubject();
     }
 
-    // TODO: Implement overdue (red) and due today (orange)
+    // TODO: Implement overdue (red) and due today (orange) - These behave as if they are started even if they are not
     /**
      * Compares task with this TaskObj. This will compare any two tasks regardless of
      * location in the Tree. It will only consider the status (for example started, completed, ...)
