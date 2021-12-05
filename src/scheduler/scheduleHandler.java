@@ -2,6 +2,7 @@ package jtaskui.scheduler;
 
 import jtaskui.TaskObj;
 import jtaskui.ui.swing.jReminder.jReminder;
+import jtaskui.util.DateUtil;
 
 import java.util.HashMap;
 
@@ -11,7 +12,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.time.temporal.ChronoUnit;
 
 /**
  * This class is responsible for scheduling. At the moment it is designed to work only for reminders of TaskObj.
@@ -55,7 +55,7 @@ public class scheduleHandler {
         if (isScheduled(task)) return;
 
         // Work out time from now until the reminder is due in seconds
-        long delaySeconds = ChronoUnit.SECONDS.between(LocalDateTime.now(), task.getReminderLocalDateTime());
+        long delaySeconds = DateUtil.secondsBetween(LocalDateTime.now(), task.getReminderLocalDateTime());
         //System.out.println(delaySeconds + " " + task.getSubject());
 
         // Create a new ScheduleExecutorService for this schedule. Only needs one thread because each Task could have a different time.

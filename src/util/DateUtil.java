@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 
 public class DateUtil {
 
@@ -100,5 +101,16 @@ public class DateUtil {
             System.err.println("Error parsing date/time for " + dateTime + " in " + outFormat + " format");
             return "N/A";
         }   
+    }
+
+    /**
+     * This method returns the number of seconds between two LocalDateTime objects.
+     *
+     * @param firstDate - LocalDateTime of the first date to test
+     * @param secondDate - LocalDateTime of the second date to test
+     * @return long - Number of seconds between the first and the second LocalDateTime objects
+     */
+    public static long secondsBetween(LocalDateTime firstDate, LocalDateTime secondDate) {
+        return ChronoUnit.SECONDS.between(firstDate, secondDate);
     }
 }

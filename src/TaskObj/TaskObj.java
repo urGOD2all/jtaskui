@@ -17,9 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 
 import javax.swing.tree.TreePath;
 
@@ -62,7 +60,6 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
     private scheduleHandler scheduleHandler;
 
     // Formatter objects for converting the date time format from TaskCoach stored format and the display format
-    private DateTimeFormatter readInDateFormat, dateDisplayFormat;
     private static final String dateDisplayFormatString = "yyyy-MM-dd HH:mm";
 
     // Fields for Date and Time formats
@@ -103,10 +100,6 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         subTaskCount = 0;
         startedCount = 0;
         completedCount = 0;
-        // Create a formatter for reading in from the file.
-        readInDateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.nnnnnn");
-        // Create a formater that for display purposes
-        dateDisplayFormat = DateTimeFormatter.ofPattern(dateDisplayFormatString);
     }
 
     /**
@@ -918,7 +911,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
     public boolean isDue() {
         if(hasDueDate()) {
             // TODO: This needs to read a configurable value for the amount of time to consider something to be due. ATM this is 24hours
-            long secondsDiff = ChronoUnit.SECONDS.between(LocalDateTime.now(), getDueDate());
+            long secondsDiff = DateUtil.secondsBetween(LocalDateTime.now(), getDueDate());
             if(secondsDiff > 0 && secondsDiff < 86400) return true;
         }
         return false;
