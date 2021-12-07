@@ -4,7 +4,6 @@ package jtaskui.ui.swing.jTaskEdit.tabs;
 import TreeTable.TreeTable;
 import jtaskui.TreeTableModels.notesTabTreeTableModel;
 import jtaskui.ui.swing.jNotesEdit.jNotesEdit;
-import jtaskui.ui.swing.jTaskEdit.jteListener;
 import jtaskui.TaskObj;
 import jtaskui.Task.NoteObj;
 
