@@ -54,7 +54,7 @@ public class Record {
      */
     public void setDescription(String newDescription) {
         this.description = newDescription;
-        if(newDescription == "") hasDescription = false;
+        if(newDescription == "" || newDescription == null) hasDescription = false;
         else hasDescription = true;
     }
 
