@@ -1,5 +1,7 @@
 package jtaskui;
 
+import jtaskui.Records.DatedRecord;
+
 import jtaskui.util.DateUtil;
 
 import jtaskui.Task.NoteObj;
@@ -22,7 +24,7 @@ import java.time.format.DateTimeFormatter;
 import javax.swing.tree.TreePath;
 
 // TODO: Interesting observation, my test setup has Tasks with IDs that are mostly the same, look into this further
-public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
+public class TaskObj extends DatedRecord implements TreeTableNode, Comparable<TaskObj> {
     // This is a map of all the attributes that the task has
     private HashMap<String, String> attributes;
 
@@ -146,10 +148,10 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
                     setID(attr.getValue());
                     break;
                 case "creationDateTime":
-                    setCreationDateTime(attr.getValue());
+                    parseCreationDateTime(attr.getValue());
                     break;
                 case "modificationDateTime":
-                    setModificationDateTime(attr.getValue());
+                    parseModificationDateTime(attr.getValue());
                     break;
                 case "duedate":
                     setDueDateTime(attr.getValue());
@@ -189,47 +191,11 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
     }
 
     /**
-     * Set the status attribute of this Task.
-     *
-     * @param String - value to set as the status
-     */
-    private void setStatus(String value) {
-        attributes.put("status", value);
-    }
-
-    /**
-     * Sets the creation date and time of this Task
-     *
-     * @param LocalDateTime - Time and date to set, will be parsed into the correct format
-     */
-    private void setCreationDateTime(LocalDateTime value) {
-        try {
-            setCreationDateTime(value.format(TaskObj.CREATION_DATE_FORMATTER));
-        }
-        catch(Exception e) {
-            System.err.println("ERROR: Cannot set creation date/time from " + value + " for " + getSubject());
-        }
-    }
-
-    /**
-     * Sets the creation date and time of this Task
-     *
-     * @param String - Time and date to set, this is not parsed and should only be used when reading stored values
-     */
-    private void setCreationDateTime(String value) {
-        attributes.put("creationDateTime", value);
-    }
-
-    private void setModificationDateTime(String value) {
-        attributes.put("modificationDateTime", value);
-    }
-
-    /**
      * Updates the modification time
      */
     // TODO; I would like this to be managed by this object, for now, the UI will have to call it
     public void updateModificationDateTime() {
-        setModificationDateTime(LocalDateTime.now().format(TaskObj.MODIFICATION_DATE_FORMATTER));
+        parseModificationDateTime(LocalDateTime.now().format(TaskObj.MODIFICATION_DATE_FORMATTER));
     }
 
     private void setDueDateTime(String value) {
@@ -315,25 +281,8 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         attributes.put("percentageComplete", value);
     }
 
-    public void setSubject(String value) {
-        attributes.put("subject", value);
-    }
-
     private void setPriority(String value) {
         attributes.put("priority", value);
-    }
-
-    /*
-     * Set the description for this task
-     */
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    /* This will set the ID. I dont think this will change so keep it private
-     */
-    private void setID(String value) {
-        attributes.put("id", value);
     }
 
     // TODO: This may need to accept something else depending on what we decide to the TODO in the global where the variable is declared
@@ -407,37 +356,6 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         return attributes.get(name);
     }
 
-    // TODO: Do I want to return this as a String or int ?
-    /**
-     * Return the status attribute of this Task
-     *
-     * @return int - status attribute of the Task
-     */
-    public int getStatus() {
-        try {
-            return Integer.parseInt(getAttribute("status"));
-        }
-        catch(NumberFormatException nfe) {
-            System.err.println("ERROR: Failed to parse status, setting to 1");
-        }
-        finally {
-            setStatus("1");
-            return 1;
-        }
-    }
-
-    public String getSubject() {
-        return getAttribute("subject");
-    }
-
-    public String getID() {
-        return getAttribute("id");
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
     public String getPriority() {
         return getAttribute("priority");
     }
@@ -445,24 +363,6 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
     /*
      * Internal getters for raw Dates and Times
      */
-
-    /**
-     * Returns a String representation of the creationDateTime attribute. This is the raw value from the datasource.
-     *
-     * @return String - the raw creation date and time attribute from the datasource
-     */
-    private String getCreationDateTime() {
-        return getAttribute("creationDateTime");
-    }
-
-    /**
-     * Returns a String representation of the modificationDateTime attribute. This is the raw value from the datasource.
-     *
-     * @return String - the raw modification date and time attribute from the datasource
-     */
-    private String getModificationDateTime() {
-        return getAttribute("modificationDateTime");
-    }
 
     /**
      * Returns a String represenation of the duedate attribute. This is the raw value from the datasource.
@@ -535,7 +435,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
      * @return LocalDateTime - Task modification date
      */
     public LocalDateTime getModificationLocalDateTime() {
-        return DateUtil.parseDateTime(getModificationDateTime(), MODIFICATION_DATE_FORMATTER, getSubject() + " Modification Date");
+        return getModificationDateTime();
     }
 
     /**
@@ -571,7 +471,7 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
      * @return LocalDateTime - Task reminder date
      */
     public LocalDateTime getCreationLocalDateTime() {
-        return DateUtil.parseDateTime(getCreationDateTime(), TaskObj.CREATION_DATE_FORMATTER, getSubject() + " Creation Date");
+        return getCreationDateTime();
     }
 
     /**
@@ -836,14 +736,9 @@ public class TaskObj implements TreeTableNode, Comparable<TaskObj> {
         return attributes.containsKey(attribute);
     }
 
-    public boolean hasDescription() {
-        if (getDescription() == "") return false;
-        return true;
-    }
-
+    // TODO: Remove this method to get the inherited one instead
     public boolean hasModificationDate() {
-        if (hasAttribute("modificationDateTime")) return true;
-        return false;
+        return hasModificationDateTime();
     }
 
     public boolean hasPlannedStartDate() {
