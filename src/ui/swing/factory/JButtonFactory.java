@@ -19,6 +19,31 @@ public class JButtonFactory {
     }
 
     /**
+     * Create a button with the specified text and ActionListener
+     *
+     * @param text - String text to set on the button
+     * @param listener - ActionListener to set on this button
+     */
+    public static JButton createButton(String text, ActionListener listener) {
+        JButton button = createButton(text);
+        button.addActionListener(listener);
+        return button;
+    }
+
+    /**
+     * Create a button with the specified text
+     *
+     * @param text - String text to set on the button
+     * @param icon - ImageIcon object for the icon to load onto the button
+     * @param listener - ActionListener to set on this button
+     */
+    public static JButton createButton(String text, ImageIcon icon, ActionListener listener) {
+        JButton button = createButton(text, listener);
+        button.setIcon(icon);
+        return button;
+    }
+
+    /**
      * Create a button with no text, icon only.
      *
      * @param icon - ImageIcon object for the icon to load onto the button

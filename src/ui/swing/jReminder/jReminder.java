@@ -2,6 +2,8 @@ package jtaskui.ui.swing.jReminder;
 
 import jtaskui.TaskObj;
 import jtaskui.ui.swing.jTaskEdit.jTaskEdit;
+import jtaskui.ui.swing.factory.JButtonFactory;
+import jtaskui.util.IconHelper;
 
 import javax.swing.JFrame;
 import javax.swing.BoxLayout;
@@ -77,12 +79,9 @@ public class jReminder {
         row1.add(taskButton);
         // Put a 10 pixel fixed spacer between the Task Button and the last button
         row1.add(Box.createRigidArea(new Dimension(10, 0)));
-        // TODO: This should be an icon only button
-        JButton startEffortButton = new JButton("Start effort");
-        // Set its minimum size
-        startEffortButton.setMinimumSize(new Dimension(58, 24));
-        // Add the button to the row
-        row1.add(startEffortButton);
+        // TODO: Make this button do something when Efforts are built
+        // Add the startEffort button
+        row1.add(JButtonFactory.createButton(IconHelper.getIcon("icons/16x16/actions/history.png")));
         // Glue the buttons in place by filling the rest of the row with Glue
         row1.add(Box.createHorizontalGlue());
 
@@ -186,12 +185,8 @@ public class jReminder {
         reminderPanel.add(Box.createRigidArea(new Dimension(0, 15)));
         reminderPanel.add(row6);
 
-        // TODO: This button should contain an image as well as text
         // OK button, pushes the reminder forward by the specified time and closes the reminder
-        JButton okButton = new JButton("OK");
-        // Open the task in the editor when this button is clicked
-        okButton.addActionListener(e->snoozeReminder());
-        row6.add(okButton);
+        row6.add(JButtonFactory.createButton("OK", IconHelper.getIcon("icons/16x16/actions/2rightarrow.png"), e->snoozeReminder()));
 
         row6.add(Box.createRigidArea(new Dimension(10, 0)));
         JButton markCompleted = new JButton("Mark task completed");
