@@ -17,6 +17,9 @@ public class DateUtil {
     public static final DateTimeFormatter LOW_PRECISION_FORMATTER   = DateTimeFormatter.ofPattern(LOW_PRECISION_FORMAT);
     public static final DateTimeFormatter DISPLAY_FORMATTER         = DateTimeFormatter.ofPattern(DISPLAY_FORMAT);
 
+    // This is a helper class and only contains static methods/fields. No instantiation allowed.
+    private DateUtil() { }
+
     /**
      * Parse Strings containing dates and times into LocalDateTime objects
      *

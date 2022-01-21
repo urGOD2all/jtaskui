@@ -6,6 +6,9 @@ import javax.imageio.ImageIO;
 
 public class IconHelper {
 
+    // This is a helper class and only contains static methods/fields. No instantiation allowed.
+    private IconHelper() {}
+
     /**
      * Helper method to fetch icons as ImageIcon objects.
      *

@@ -8,6 +8,9 @@ import java.awt.event.ActionListener;
 
 public class JButtonFactory {
 
+    // This is a helper class and only contains static methods/fields. No instantiation allowed.
+    private JButtonFactory() {}
+
     /**
      * Create a button with the specified text
      *
