@@ -25,6 +25,9 @@ public abstract class DatedRecord extends Record {
     public DatedRecord() {
         // Call the default constructor for Record
         super();
+        // Add the methods that get the String attributes for all the attributes in this class
+        super.addAttributeGetter("subject", () -> getSubject());
+        super.addAttributeGetter("creationDateTime", () -> DateUtil.formatToString(getCreationDateTime(), CREATION_DATE_FORMATTER, false));
         // Set false unless the setter is called
         this.hasModificationDateTime = false;
     }
@@ -58,7 +61,10 @@ public abstract class DatedRecord extends Record {
      */
     public void setModificationDateTime(LocalDateTime newModificationDateTime) {
         this.modificationDateTime = newModificationDateTime;
-        hasModificationDateTime = true;
+        if(hasModificationDateTime() == false) {
+            hasModificationDateTime = true;
+            super.addAttributeGetter("modificationDateTime", () -> DateUtil.formatToString(getModificationDateTime(), MODIFICATION_DATE_FORMATTER, false));
+        }
     }
 
     /**
@@ -103,7 +109,7 @@ public abstract class DatedRecord extends Record {
      * @param String - Date and time in CREATION_DATE_FORMATTER format to be parsed
      */
     public void parseCreationDateTime(String newCreationDateTime) {
-        this.creationDateTime = DateUtil.parseDateTime(newCreationDateTime, CREATION_DATE_FORMATTER, getSubject() + " Creation Date");
+        this.setCreationDateTime(DateUtil.parseDateTime(newCreationDateTime, CREATION_DATE_FORMATTER, getSubject() + " Creation Date"));
     }
 
     /**
@@ -112,8 +118,7 @@ public abstract class DatedRecord extends Record {
      * @param String - Date and time in MODIFICATION_DATE_FORMATTER format to be parsed
      */
     public void parseModificationDateTime(String newModificationDateTime) {
-        this.modificationDateTime = DateUtil.parseDateTime(newModificationDateTime, MODIFICATION_DATE_FORMATTER, getSubject() + " Modification Date");
-        hasModificationDateTime = true;
+        this.setModificationDateTime(DateUtil.parseDateTime(newModificationDateTime, MODIFICATION_DATE_FORMATTER, getSubject() + " Modification Date"));
     }
 
     /**

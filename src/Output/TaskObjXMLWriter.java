@@ -1,5 +1,6 @@
 package jtaskui.Output;
 
+import jtaskui.Records.AttributeGetter;
 import jtaskui.TaskObj;
 import jtaskui.Task.NoteObj;
 
@@ -115,6 +116,11 @@ public class TaskObjXMLWriter {
             // Add all the attributes to this Element object
             for(Map.Entry<String, String> attribute : task.getAttributes().entrySet()) {
                 e.setAttribute(attribute.getKey(), attribute.getValue());
+            }
+
+            // Add all the migrated attributes to this Element object
+            for(Map.Entry<String, AttributeGetter> attribute : task.getAttributeGetters().entrySet()) {
+                e.setAttribute(attribute.getKey(), attribute.getValue().execute());
             }
 
             // Add all the (currently) unsupported attributes to this Element object

@@ -2,6 +2,7 @@ package jtaskui.Records;
 
 import jtaskui.util.DateUtil;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 /**
@@ -16,10 +17,25 @@ public class Record {
     private String description;
     private boolean hasDescription;
 
+    // All String getter methods (used by file writers to get all Attributes from Records)
+    private HashMap<String, AttributeGetter> attributeGetters;
+
+    public HashMap<String, AttributeGetter> getAttributeGetters() {
+        return new HashMap<String, AttributeGetter>(attributeGetters);
+    }
+
+    protected void addAttributeGetter(String attributeName, AttributeGetter getterMethod) {
+        attributeGetters.put(attributeName, getterMethod);
+    }
+
     /**
      * Default constructor to set sane defaults
      */
     public Record() {
+        attributeGetters = new HashMap<String, AttributeGetter>();
+        // Add the attributes provided by Record. NOTE: The description is not an attribute, its a sub-element so is not added here
+        this.addAttributeGetter("id", () -> getID());
+        this.addAttributeGetter("status", () -> getStatus());
         status = "1";
         // Set this to false until the setter is called
         hasDescription = false;
