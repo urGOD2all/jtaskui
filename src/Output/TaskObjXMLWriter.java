@@ -191,6 +191,11 @@ public class TaskObjXMLWriter {
             noteElement.setAttribute(attribute.getKey(), attribute.getValue());
         }
 
+        // Add all the migrated attributes to this Element object
+        for(Map.Entry<String, AttributeGetter> attribute : note.getAttributeGetters().entrySet()) {
+            noteElement.setAttribute(attribute.getKey(), attribute.getValue().execute());
+        }
+
         // Set the description if it exists
         if(note.hasDescription()) {
             // Create an Element for the description
