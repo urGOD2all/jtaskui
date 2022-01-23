@@ -2,9 +2,12 @@ package jtaskui.view;
 
 import jtaskui.TaskObj;
 import jtaskui.util.DateUtil;
+import jtaskui.util.IconHelper;
 
 import TreeTable.AbstractTreeTableModel;
 import TreeTable.TreeTableModel;
+
+import javax.swing.ImageIcon;
 
 import java.util.ArrayList;
 
@@ -20,7 +23,10 @@ public class jTaskViewTreeTableModel extends AbstractTreeTableModel {
 
     // TODO: This needs some fixing
     // Store the column classes
-    private Class<?>[] columnTypes = { TreeTableModel.class, String.class };
+    private Class<?>[] columnTypes = { TreeTableModel.class, String.class, ImageIcon.class };
+
+    // The icon used for notes
+    public static final ImageIcon noteIcon = IconHelper.getIcon("icons/16x16/apps/knotes.png");
 
     /*
      * Constructors
@@ -33,6 +39,7 @@ public class jTaskViewTreeTableModel extends AbstractTreeTableModel {
         super();
         columnNames = new ArrayList<String>();
         this.addColumn("Task Subject");
+        this.addColumn("Notes");
         this.addColumn("Creation Date");
         this.addColumn("Modification Date");
     }
@@ -57,6 +64,7 @@ public class jTaskViewTreeTableModel extends AbstractTreeTableModel {
     public Class<?> getColumnClass(int column) {
         //TODO: fix me, when adding columns all columns should get added with a type or we will have to figure it out and add it to the array
         if (column == 0) return columnTypes[0];
+        else if (column == 1) return columnTypes[2];
         return columnTypes[1];
     }
 
@@ -97,6 +105,10 @@ public class jTaskViewTreeTableModel extends AbstractTreeTableModel {
             case "Modification Date":
                 if (task.hasModificationDate()) return DateUtil.formatToString(task.getModificationLocalDateTime(), DateUtil.DISPLAY_FORMATTER, true);
                 else return "N/A";
+            case "Notes":
+                // Return an Icon
+                if(task.hasSubNote()) return noteIcon;
+                else return "";
             default:
                 return "ERROR: Failed to getValueAt " + columnIndex;
         }
